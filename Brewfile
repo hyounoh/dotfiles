@@ -28,6 +28,7 @@ brew "zsh-syntax-highlighting"
 brew "starship"
 brew "chezmoi"
 cask "font-meslo-lg-nerd-font"
+cask "ghostty"
 
 # ── 네트워크 ──
 brew "wget"
