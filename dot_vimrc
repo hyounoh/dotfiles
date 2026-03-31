@@ -1,0 +1,74 @@
+"" === 플러그인 (vim-plug) ===
+call plug#begin('~/.vim/plugged')
+
+" 파일 탐색/검색
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
+Plug 'preservim/nerdtree'
+
+" 상태바
+Plug 'vim-airline/vim-airline'
+
+" Git
+Plug 'tpope/vim-fugitive'
+Plug 'airblade/vim-gitgutter'
+
+" 편집
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-commentary'
+Plug 'tpope/vim-repeat'
+Plug 'jiangmiao/auto-pairs'
+Plug 'easymotion/vim-easymotion'
+
+" 외형
+Plug 'morhetz/gruvbox'
+Plug 'ryanoasis/vim-devicons'
+Plug 'Yggdroot/indentLine'
+
+call plug#end()
+
+"" === 기본 설정 ===
+set number
+set relativenumber
+set scrolloff=5
+set showmode
+set visualbell
+set history=1000
+set clipboard+=unnamed
+let mapleader = " "
+
+"" === 검색 설정 ===
+set ignorecase
+set smartcase
+set hlsearch
+set incsearch
+
+"" === 컬러 테마 ===
+set termguicolors
+set background=dark
+colorscheme gruvbox
+
+"" === airline ===
+let g:airline_theme = 'gruvbox'
+
+"" === NERDTree ===
+nmap <leader>e :NERDTreeToggle<CR>
+
+"" === fzf ===
+nmap <leader>fi :Files<CR>
+nmap <leader>rg :Rg<CR>
+nmap <leader>b :Buffers<CR>
+
+"" === easymotion ===
+let g:EasyMotion_do_mapping = 0
+nmap <leader><leader>w <Plug>(EasyMotion-w)
+nmap <leader><leader>b <Plug>(EasyMotion-b)
+
+"" === 편의 기능 ===
+nmap <leader>nl :nohlsearch<CR>
+inoremap jj <Esc>
+inoremap jk <Esc>
+vnoremap < <gv
+vnoremap > >gv
+vnoremap J :m '>+1<CR>gv=gv
+vnoremap K :m '<-2<CR>gv=gv
