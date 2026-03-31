@@ -1,6 +1,7 @@
 # ── 코드 검색 / 텍스트 처리 ──
 brew "ripgrep"
 brew "jq"
+brew "yq"
 brew "fzf"
 brew "fd"
 brew "bat"
@@ -11,6 +12,7 @@ brew "watch"
 brew "git"
 brew "gh"
 brew "lazygit"
+brew "delta"
 
 # ── 터미널 생산성 ──
 brew "tmux"
@@ -55,5 +57,6 @@ brew "awscli"
 brew "saml2aws"
 brew "kubernetes-cli"
 brew "kubectx"
+brew "k9s"
 brew "helm"
 brew "eksctl"
