@@ -7,7 +7,7 @@ brew "fd"
 brew "bat"
 brew "util-linux"
 brew "watch"
-brew "visidata"
+brew "miller"
 
 # ── Git / GitHub ──
 brew "git"
