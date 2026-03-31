@@ -35,6 +35,8 @@ cask "ghostty"
 # ── 네트워크 ──
 brew "wget"
 brew "nmap"
+brew "gping"
+brew "doggo"
 
 # ── 암호화 ──
 brew "openssl@3"
@@ -50,6 +52,7 @@ brew "lazydocker"
 
 # ── DB 클라이언트 ──
 brew "mysql-client"
+brew "lazysql"
 brew "redis"
 
 # ── Kafka ──
