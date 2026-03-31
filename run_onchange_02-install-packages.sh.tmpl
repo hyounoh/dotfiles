@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Brewfile hash: {{ include "Brewfile" | sha256sum }}
+set -euo pipefail
+
+echo "[INFO] brew bundle 실행 중..."
+brew bundle --file="{{ .chezmoi.sourceDir }}/Brewfile" --no-lock
+echo "[DONE] 패키지 설치 완료"
