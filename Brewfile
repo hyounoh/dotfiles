@@ -24,9 +24,10 @@ brew "gum"
 brew "zsh-autosuggestions"
 brew "zsh-syntax-highlighting"
 
-# ── 프롬프트 ──
+# ── 프롬프트 / 폰트 ──
 brew "starship"
 brew "chezmoi"
+cask "font-meslo-lg-nerd-font"
 
 # ── 네트워크 ──
 brew "wget"
