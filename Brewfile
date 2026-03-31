@@ -8,6 +8,7 @@ brew "bat"
 brew "util-linux"
 brew "watch"
 brew "miller"
+brew "tidy-viewer"
 
 # ── Git / GitHub ──
 brew "git"
