@@ -1,7 +1,7 @@
-font-family = MesloLGS Nerd Font
+font-family = D2CodingLigature Nerd Font Mono
 font-size = 15
 
-theme = Everforest Dark Hard
+theme = Gruvbox Dark Hard
 
 window-padding-x = 8
 window-padding-y = 4
