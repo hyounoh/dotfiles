@@ -8,7 +8,7 @@ chezmoi로 관리하는 개발 환경 설정. 이 저장소는 **private**이므
 한 줄로:
 
 ```bash
-bash <(curl -fsSL https://gist.githubusercontent.com/hyounoh/38d3fcec52d6d194c69f2150a5aab089/raw/gistfile1.txt)
+bash <(curl -fsSL https://gist.githubusercontent.com/hyounoh/38d3fcec52d6d194c69f2150a5aab089/raw/bootstrap.sh)
 ```
 
 스크립트가 자동으로 해주는 것:
