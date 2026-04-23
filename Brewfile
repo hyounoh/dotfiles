@@ -42,8 +42,7 @@ brew "doggo"        # 모던 DNS 클라이언트 (dig 대체)
 brew "openssl@3"    # LibreSSL보다 기능 풍부한 OpenSSL
 
 # ── JVM / Java ──
-cask "temurin@17"   # Eclipse Temurin JDK 17 (LTS)
-cask "temurin@21"   # Eclipse Temurin JDK 21 (LTS)
+# JDK는 mise로 관리 (cask temurin은 sudo 프롬프트 필요로 brew bundle에서 제외)
 brew "gradle"       # Gradle 빌드 도구 (프로젝트 wrapper 없을 때)
 brew "mise"         # JDK·Node 등 런타임 버전 관리
 

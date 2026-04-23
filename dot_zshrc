@@ -4,10 +4,6 @@ ZSH_THEME=""  # disabled: using starship
 plugins=(git)
 source "$ZSH/oh-my-zsh.sh"
 
-# ── JDK ───────────────────────────────────────────────────
-export JAVA_HOME=$(/usr/libexec/java_home -v 21 2>/dev/null)
-export PATH="$JAVA_HOME/bin:$PATH"
-
 # ── Cargo ─────────────────────────────────────────────────
 [[ -f "$HOME/.cargo/env" ]] && source "$HOME/.cargo/env"
 

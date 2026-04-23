@@ -1,0 +1,11 @@
+[tools]
+java            = "temurin-21"
+python          = "3.13"
+node            = "22"
+go              = "1.25"
+"npm:typescript" = "latest"
+
+# 환경별 설정은 config.{env}.toml 에 분리.
+#   MISE_ENV=local mise current
+#   MISE_ENV=dev   mise env
+#   MISE_ENV=prod  mise exec -- cmd

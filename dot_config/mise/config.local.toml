@@ -1,0 +1,4 @@
+[env]
+DB_USER = "REPLACE_ME_local_user"
+DB_HOST = "localhost:3306"
+DB_PASS = "REPLACE_ME_local_pass"
