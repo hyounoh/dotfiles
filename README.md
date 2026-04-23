@@ -39,7 +39,7 @@ mise install
 $EDITOR ~/.zshrc.d/secrets.zsh
 
 # 회사 머신이면: 회사 GitHub 계정용 SSH 키도 별도 생성/등록
-ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -C "hyounoh@users.noreply.github.com"
+ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -C "hyounoh@your-company.co.kr"
 ```
 
 ### bootstrap.sh 수정 시 주의
