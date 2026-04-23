@@ -1,5 +1,0 @@
-; Loaded only for repos whose remote uses the github-personal SSH alias.
-; Main ~/.gitconfig references this file via [includeIf "hasconfig:remote.*.url:..."]
-[user]
-    name = hyounoh
-    email = hyounoh@users.noreply.github.com

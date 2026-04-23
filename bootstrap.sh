@@ -68,7 +68,15 @@ say "SSH 인증 성공"
 say "chezmoi 설치 및 dotfiles 적용 (수 분 소요)"
 sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply "$REPO_URL"
 
-# ── 6. 안내 ───────────────────────────────────────────────
+# ── 6. dotfiles repo만 개인 identity로 덮어쓰기 ───────────
+# 회사 머신에서 global identity가 회사용이더라도, 이 한 repo의 커밋은
+# 항상 개인 계정으로 찍히도록 local .git/config에 고정.
+say "dotfiles repo identity를 개인으로 고정"
+chezmoi_src="$(chezmoi source-path)"
+git -C "$chezmoi_src" config user.name "hyounoh"
+git -C "$chezmoi_src" config user.email "hyounoh@users.noreply.github.com"
+
+# ── 7. 안내 ───────────────────────────────────────────────
 echo
 say "부트스트랩 완료. 후속 수동 단계:"
 cat <<'EOF'

@@ -1,10 +1,6 @@
 [user]
 	name = {{ .name }}
 	email = {{ .email }}
-; Personal identity override for repos cloned via the github-personal SSH alias.
-; Git >= 2.36 required. Applied only when remote.*.url matches the pattern below.
-[includeIf "hasconfig:remote.*.url:git@github-personal:*/**"]
-	path = ~/.gitconfig-personal
 [core]
 	pager = delta
 [interactive]

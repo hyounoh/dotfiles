@@ -49,12 +49,21 @@ ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -C "hyounoh@your-company.co.kr"
 
 ## 프로파일과 git identity
 
-| profile | 기본 identity | 특이사항 |
-|---------|--------------|----------|
-| `personal` (default) | `hyounoh <hyounoh@users.noreply.github.com>` | 모든 repo에서 개인 identity |
-| `work` | `hyounoh <hyounoh@users.noreply.github.com>` | `github-personal:` 원격 repo만 개인 identity로 자동 오버라이드 |
+| profile | `~/.gitconfig`의 기본 identity |
+|---------|------------------------------|
+| `personal` (default) | `hyounoh <hyounoh@users.noreply.github.com>` |
+| `work` | `hyounoh <hyounoh@users.noreply.github.com>` |
 
-오버라이드는 `~/.gitconfig`의 `[includeIf "hasconfig:remote.*.url:git@github-personal:*/**"]`로 구현. Git 2.36 이상 필요.
+회사 머신(`work`)이어도 이 dotfiles 저장소 자체의 커밋은 개인 identity로 찍힘.
+bootstrap.sh가 chezmoi init 직후 아래 두 줄을 실행해서 repo-local 설정으로 박아둠:
+
+```bash
+git -C "$(chezmoi source-path)" config user.name "hyounoh"
+git -C "$(chezmoi source-path)" config user.email "hyounoh@users.noreply.github.com"
+```
+
+회사 머신에서 **다른 개인 repo**를 clone하게 되면 기본 identity가 회사용이므로,
+해당 repo에서 `git config user.email hyounoh@users.noreply.github.com` 수동 설정 필요.
 
 ## 환경변수 프로파일 (mise)
 
