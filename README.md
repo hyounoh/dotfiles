@@ -18,7 +18,7 @@ bash <(curl -fsSL https://gist.githubusercontent.com/hyounoh/38d3fcec52d6d194c69
 4. chezmoi 설치 + `git@github-personal:hyounoh/dotfiles.git` 기반 `init --apply`
 
 init 중 프롬프트:
-- `machine profile [work,personal]`: 머신 용도 선택
+- `machine profile [personal,work]`: 머신 용도 선택 (기본 personal)
 - `git user.name` / `git user.email`: 기본값 표시됨, Enter로 수락
 
 자동 실행되는 chezmoi scripts:
@@ -51,8 +51,8 @@ ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -C "hyounoh@users.noreply.github.com"
 
 | profile | 기본 identity | 특이사항 |
 |---------|--------------|----------|
+| `personal` (default) | `hyounoh <hyounoh@users.noreply.github.com>` | 모든 repo에서 개인 identity |
 | `work` | `hyounoh <hyounoh@users.noreply.github.com>` | `github-personal:` 원격 repo만 개인 identity로 자동 오버라이드 |
-| `personal` | `hyounoh <hyounoh@users.noreply.github.com>` | 모든 repo에서 개인 identity |
 
 오버라이드는 `~/.gitconfig`의 `[includeIf "hasconfig:remote.*.url:git@github-personal:*/**"]`로 구현. Git 2.36 이상 필요.
 

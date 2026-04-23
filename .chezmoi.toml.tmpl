@@ -1,9 +1,9 @@
-{{- /* machine profile: work (default) or personal */ -}}
-{{- $profile := promptChoiceOnce . "profile" "machine profile" (list "work" "personal") -}}
+{{- /* machine profile: personal (default) or work (work laptop) */ -}}
+{{- $profile := promptChoiceOnce . "profile" "machine profile" (list "personal" "work") "personal" -}}
 
 {{- $defaultName  := "hyounoh" -}}
 {{- $defaultEmail := "hyounoh@users.noreply.github.com" -}}
-{{- if eq $profile "personal" -}}
+{{- if eq $profile "work" -}}
 {{-   $defaultName  = "hyounoh" -}}
 {{-   $defaultEmail = "hyounoh@users.noreply.github.com" -}}
 {{- end -}}
