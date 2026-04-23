@@ -2,8 +2,9 @@
 # hyounoh/dotfiles bootstrap — set up personal SSH key, register at GitHub,
 # then install chezmoi and apply the private dotfiles repo.
 #
-# Public mirror (for curl|bash on fresh machines) should be kept in sync at:
-#   https://gist.github.com/hyounoh/<gist-id>/raw/bootstrap.sh
+# Public mirror (for curl|bash on fresh machines) kept in sync at:
+#   https://gist.github.com/hyounoh/38d3fcec52d6d194c69f2150a5aab089
+# When this file changes, paste the updated contents into that gist.
 
 set -euo pipefail
 

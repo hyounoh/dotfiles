@@ -5,52 +5,33 @@ chezmoi로 관리하는 개발 환경 설정. 이 저장소는 **private**이므
 
 ## 새 맥 부트스트랩
 
-### 1) 개인 SSH 키 생성 + GitHub 등록
+한 줄로:
 
 ```bash
-# (이미 생성돼 있으면 skip)
-ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519_personal -C "hyounoh-personal" -N ""
-
-# 공개키 복사 후 GitHub에 등록
-pbcopy < ~/.ssh/id_ed25519_personal.pub
-open https://github.com/settings/ssh/new
+bash <(curl -fsSL https://gist.githubusercontent.com/hyounoh/38d3fcec52d6d194c69f2150a5aab089/raw/gistfile1.txt)
 ```
 
-GitHub 페이지에서 키 붙여넣고 저장.
+스크립트가 자동으로 해주는 것:
+1. 개인 SSH 키 생성 (`~/.ssh/id_ed25519_personal`)
+2. 공개키를 클립보드에 복사 + GitHub SSH 설정 페이지 오픈
+3. 사용자가 키 등록하면 Enter → 임시 SSH config 작성 + 인증 테스트
+4. chezmoi 설치 + `git@github-personal:hyounoh/dotfiles.git` 기반 `init --apply`
 
-### 2) 임시 SSH config (chezmoi가 이후 덮어씀)
-
-```bash
-mkdir -p ~/.ssh && chmod 700 ~/.ssh
-cat >> ~/.ssh/config <<'EOF'
-Host github-personal
-  HostName github.com
-  User git
-  IdentityFile ~/.ssh/id_ed25519_personal
-EOF
-```
-
-### 3) chezmoi init
-
-```bash
-sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply \
-  git@github-personal:hyounoh/dotfiles.git
-```
-
-프롬프트:
+init 중 프롬프트:
 - `machine profile [work,personal]`: 머신 용도 선택
 - `git user.name` / `git user.email`: 기본값 표시됨, Enter로 수락
 
-자동 실행되는 것:
-- dotfiles 배치 (`.zshrc`, `.vimrc`, `.gitconfig`, mise config 등)
+자동 실행되는 chezmoi scripts:
 - Homebrew 설치 (없으면)
 - Brewfile 기반 46개 패키지 설치
 - oh-my-zsh 설치
 - `~/.zshrc.d/secrets.zsh` 템플릿 생성 (관리 밖, 머신별 값)
 
-### 4) 후속 수동 단계
+### 후속 수동 단계
 
 ```bash
+# 새 셸 띄우기 (zsh plugins/aliases 로드)
+
 # 언어 런타임 설치 (mise.lock 기반)
 mise install
 
@@ -60,6 +41,11 @@ $EDITOR ~/.zshrc.d/secrets.zsh
 # 회사 머신이면: 회사 GitHub 계정용 SSH 키도 별도 생성/등록
 ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -C "hyounoh@users.noreply.github.com"
 ```
+
+### bootstrap.sh 수정 시 주의
+
+저장소 루트의 `bootstrap.sh`를 수정하면 위 gist 내용도 수동 갱신해야 함
+(gist는 별도 public mirror). gist URL: https://gist.github.com/hyounoh/38d3fcec52d6d194c69f2150a5aab089
 
 ## 프로파일과 git identity
 
