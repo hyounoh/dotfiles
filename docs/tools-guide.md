@@ -330,47 +330,246 @@ gradle dependencies
 
 ## 네트워크 / HTTP
 
-### curl
-HTTP 클라이언트 (가장 표준).
+### HTTP 클라이언트
+
+#### curl (built-in)
+사실상 표준. 어디에나 있음.
 ```bash
-curl -fsSL https://example.com
-curl -I https://example.com             # 헤더만
+curl -fsSL https://example.com           # fail-silent-show-errors-location
+curl -I https://example.com              # 헤더만
 curl -X POST -H "Content-Type: application/json" \
      -d '{"a":1}' https://api.example.com
-curl -u user:pass https://...           # basic auth
-curl -o file.tgz https://...            # 저장
-curl -v https://...                     # 상세 로그
+curl -u user:pass https://...            # basic auth
+curl -o file.tgz https://...             # 저장
+curl -v https://... 2>&1 | grep '^<'     # 응답 헤더만 필터
+curl --resolve host:443:1.2.3.4 ...      # DNS 오버라이드 (로드밸런서 디버깅)
 ```
 
-### wget
-파일 다운로드 (curl과 다름: resumable, mirror 지원).
+#### wget
+파일 다운로드 (resumable, mirror 지원).
 ```bash
 wget https://example.com/file.tgz
 wget -c URL                              # 이어받기
-wget -r -l2 URL                          # 재귀 다운로드
+wget -r -l2 URL                          # 재귀 2단계
+wget --mirror --no-parent URL            # 사이트 미러링
 ```
 
-### nmap
-포트 스캔.
-```bash
-nmap -sT localhost                       # TCP connect scan
-nmap -p 80,443 host                      # 특정 포트
-nmap -A 192.168.0.0/24                    # OS/버전 감지
-```
+#### 추천 (Brewfile 미포함)
+- **`httpie` (`http`)** — 인간친화적 JSON 중심 HTTP 클라이언트. `http POST api/x name=John`
+- **`xh`** — httpie 호환 + Rust로 빠름. `xh POST api name=John`
+- **`curlie`** — curl 문법 + httpie UX 하이브리드
 
-### gping
-ping 그래프.
-```bash
-gping google.com cloudflare.com github.com
-```
+### DNS 도구
 
-### doggo
+#### doggo (Brewfile)
 모던 DNS 클라이언트 (dig 대체).
 ```bash
-doggo github.com
+doggo github.com                         # A 레코드 기본
 doggo MX gmail.com
-doggo A example.com @1.1.1.1            # 특정 resolver
-doggo --json github.com
+doggo TXT _dmarc.example.com
+doggo A example.com @1.1.1.1             # 특정 resolver
+doggo --json github.com                  # JSON 출력 (스크립트용)
+doggo --short github.com                 # IP만
+```
+
+#### dig (built-in)
+BIND 표준. 클래식이지만 여전히 유용.
+```bash
+dig github.com
+dig +short github.com                    # IP만
+dig +trace github.com                    # 루트 → 권한 있는 네임서버까지 추적
+dig @8.8.8.8 github.com MX
+dig -x 8.8.8.8                           # 역방향 조회
+```
+
+#### host / nslookup (built-in)
+간단한 변형.
+```bash
+host github.com
+nslookup github.com 1.1.1.1
+```
+
+#### scutil (macOS)
+macOS의 DNS resolver 상태.
+```bash
+scutil --dns                             # resolver configuration
+scutil --nwi                             # 네트워크 인터페이스 순위
+```
+
+### 경로 / 지연 (Routing & Latency)
+
+#### gping (Brewfile)
+ping 그래프 (여러 호스트 동시).
+```bash
+gping google.com cloudflare.com github.com
+gping -c 10 host                         # 10회만
+```
+
+#### ping (built-in)
+ICMP 핑.
+```bash
+ping -c 4 github.com                     # 4회
+ping -i 0.2 host                         # 0.2초 간격
+sudo ping -f host                        # flood (주의)
+```
+
+#### traceroute (built-in)
+경로 추적.
+```bash
+traceroute github.com
+traceroute -w 2 -q 1 host                # 2초 타임아웃, 1회 시도
+sudo traceroute -I host                   # ICMP 사용
+```
+
+#### 추천 — mtr
+traceroute + ping 결합, 실시간 패킷 손실 분석. `brew install mtr`.
+```bash
+sudo mtr github.com                       # 실시간 대시보드
+sudo mtr -rwc 100 host                     # 100패킷 report 후 종료
+```
+
+### 포트 / 연결 상태
+
+#### nmap (Brewfile)
+포트 스캔 / 네트워크 탐색.
+```bash
+nmap -sT localhost                        # TCP connect scan (권한 불필요)
+nmap -p 80,443 host                       # 특정 포트
+nmap -A 192.168.0.0/24                    # OS/버전 감지 (집 네트워크 탐색)
+nmap -p- host                              # 전 포트 (65535) 스캔
+nmap --top-ports 100 host                  # 인기 포트 100개
+```
+
+#### lsof (built-in)
+열린 소켓/파일.
+```bash
+lsof -i                                   # 모든 네트워크 연결
+lsof -i :8080                             # 8080 포트 쓰는 프로세스
+lsof -i tcp -P -n                          # DNS resolve 안 하고 빠르게
+lsof -iTCP -sTCP:LISTEN                    # listen 중인 TCP만
+```
+
+#### netstat (built-in, macOS 버전)
+```bash
+netstat -an                               # 모든 연결
+netstat -rn                               # 라우팅 테이블
+netstat -i                                # 인터페이스 통계
+```
+
+#### nc (netcat, built-in)
+TCP/UDP 임의 통신.
+```bash
+nc -zv host 22                            # 22 포트 열림 체크
+nc -l 8080                                # 8080에서 listen
+nc -u host 53                             # UDP
+echo "GET / HTTP/1.0" | nc host 80        # 수동 HTTP
+nc -vz host 20-25                         # 포트 범위 스캔
+```
+
+### 인터페이스 / 주소
+
+#### ifconfig / ipconfig (built-in)
+```bash
+ifconfig                                  # 전체 인터페이스
+ifconfig en0                              # 특정 인터페이스
+ipconfig getifaddr en0                    # Wi-Fi IP만 (macOS)
+ipconfig getsummary en0                   # 전체 요약
+networksetup -listallhardwareports        # 하드웨어 포트 목록 (macOS)
+```
+
+#### arp (built-in)
+ARP 테이블.
+```bash
+arp -a                                     # 로컬 ARP 캐시
+arp -d host                                # 엔트리 삭제 (sudo 필요)
+```
+
+#### route (built-in)
+```bash
+route get github.com                       # 특정 호스트 향한 경로
+route -n get default                        # 기본 게이트웨이
+```
+
+### 대역폭 / 트래픽 모니터링
+
+#### 추천 — bandwhich
+프로세스별 라이브 대역폭 (Rust). `brew install bandwhich`.
+```bash
+sudo bandwhich                             # 인터랙티브 TUI
+```
+
+#### 추천 — iperf3
+호스트 간 대역폭 테스트. `brew install iperf3`.
+```bash
+iperf3 -s                                  # 서버 모드
+iperf3 -c server-host                      # 클라이언트
+iperf3 -c host -R                          # 역방향 (서버→클라이언트)
+```
+
+#### 추천 — speedtest-cli
+인터넷 속도 측정. `brew install speedtest-cli`.
+```bash
+speedtest-cli
+speedtest-cli --simple
+```
+
+### 터널링 / 포트 포워딩 (SSH 기반)
+
+```bash
+ssh -L 8080:localhost:3000 host            # 로컬 8080 → 원격 localhost:3000
+ssh -R 9000:localhost:3000 host            # 원격 9000 → 로컬 3000
+ssh -D 1080 host                            # SOCKS 프록시 (localhost:1080)
+ssh -fNL 5432:db:5432 bastion              # 백그라운드 DB 터널
+autossh -M 0 -fN -L 8080:localhost:8080 host  # autossh로 끊김 시 자동 재연결
+```
+
+`-f`: 백그라운드, `-N`: 명령 실행 안 함(터널 전용), `-M 0`: autossh 모니터 포트 비활성.
+
+### 패킷 캡처 / 디버깅
+
+#### tcpdump (built-in)
+패킷 캡처.
+```bash
+sudo tcpdump -i en0                        # Wi-Fi 트래픽
+sudo tcpdump -i en0 'port 443'             # HTTPS만
+sudo tcpdump -nn -A 'port 80'              # HTTP 본문 (평문만)
+sudo tcpdump -i any -w capture.pcap        # Wireshark 포맷으로 저장
+```
+
+#### 추천 — Wireshark
+GUI 패킷 분석기. `brew install --cask wireshark`.
+- `tshark` CLI도 함께 설치됨.
+
+### HTTP 중간자 (프록시) — mitmproxy
+HTTPS 요청 실시간 가로채기/수정. `brew install mitmproxy`.
+```bash
+mitmproxy                                  # TUI
+mitmweb                                    # 브라우저 UI
+```
+
+### 빠른 레시피
+
+```bash
+# 내 공인 IP
+curl -s ifconfig.me; echo
+dig +short myip.opendns.com @resolver1.opendns.com
+
+# SSL 인증서 만료일
+echo | openssl s_client -connect github.com:443 2>/dev/null \
+  | openssl x509 -noout -dates
+
+# 특정 포트 점유 프로세스 죽이기
+lsof -ti :3000 | xargs kill -9
+
+# 로컬 네트워크 모든 장비 찾기
+nmap -sn 192.168.0.0/24
+
+# 간단한 HTTP 서버
+python3 -m http.server 8000               # 현재 디렉토리 서빙
+
+# 클립보드 ↔ 네트워크
+pbpaste | curl -X POST -d @- https://...
+curl -s URL | pbcopy
 ```
 
 ---
@@ -564,6 +763,24 @@ Spotlight 대체. 설치 후 ⌘+Space를 Raycast에 넘김.
 - GitHub (PR/issue 검색)
 - Jira (티켓 검색)
 - Kill Process
+
+### Karabiner-Elements
+키보드 리맵 엔진. 이 dotfiles의 프로파일:
+- Caps Lock ↔ Left Control 스왑
+- Right Command → F18 (macOS symbolichotkey 61과 연동해 한/영 전환)
+
+설정 파일: `~/.config/karabiner/karabiner.json` (chezmoi 관리).
+**최초 실행 시 macOS 접근성 권한 수동 승인 필요** (자동화 불가).
+
+### macOS 시스템 defaults (이 dotfiles가 자동 적용)
+`run_onchange_05-macos-defaults.sh`로 관리. 현재 항목:
+- 입력 소스 단축키 (이전 비활성, 다음 = F18)
+- Spotlight 비활성 (Raycast가 대체)
+- F1/F2 표준 function 키
+- 키 반복 속도 최소 (`KeyRepeat=2`, `InitialKeyRepeat=15`, `ApplePressAndHoldEnabled=false`)
+- 트랙패드 탭 클릭 (내장 + Bluetooth)
+
+수동 관리하는 설정을 추가하려면 이 스크립트에 `defaults write ...` 줄을 더하면 됨.
 
 ---
 

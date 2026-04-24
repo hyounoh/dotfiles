@@ -26,10 +26,11 @@ init 중 추가 프롬프트:
   - work profile → 기본값 없음, 현재 회사 이메일/이름 명시적으로 입력
 
 자동 실행되는 chezmoi scripts:
-- Homebrew 설치 (없으면)
-- Brewfile 기반 46개 패키지 설치
-- oh-my-zsh 설치
-- `~/.zshrc.d/secrets.zsh` 템플릿 생성 (관리 밖, 머신별 값)
+- Homebrew 설치 (없으면) — `run_once_01`
+- Brewfile 기반 패키지 일괄 설치 — `run_onchange_02` (Brewfile 해시 변경 시 재실행)
+- oh-my-zsh 설치 — `run_once_03`
+- `~/.zshrc.d/secrets.zsh` 템플릿 생성 — `run_once_04`
+- macOS defaults 적용 (키보드/트랙패드 등) — `run_onchange_05`
 
 ### 후속 수동 단계
 
@@ -90,6 +91,34 @@ export MISE_ENV=dev        # or local, prod
 echo $DB_USER              # 해당 환경 값 주입
 ```
 
+## macOS 시스템 설정 자동화
+
+`run_onchange_05-macos-defaults.sh`가 시스템 defaults를 **idempotent하게** 적용.
+각 설정이 독립적으로 시도되며, 하나가 실패해도 다른 항목은 계속 적용됨.
+실패 시 어느 항목이 실패했는지 요약 리포트.
+
+현재 포함된 항목:
+- 키보드 단축키
+  - ⌃Space (이전 입력 소스) 비활성
+  - 다음 입력 소스를 **F18**로 (Karabiner의 Right Command → F18과 연동 → 한/영 전환)
+  - Spotlight ⌘Space / ⌘⌥Space 비활성 (Raycast가 대체)
+  - F1/F2 등을 표준 function 키로
+- 키 반복 속도: `KeyRepeat=2`, `InitialKeyRepeat=15`, `ApplePressAndHoldEnabled=false`
+- 트랙패드 탭 클릭: 내장 + Bluetooth 양쪽
+
+Karabiner 프로파일은 `private_dot_ssh`와 동일한 0600 패턴으로 `dot_config/private_karabiner/`에 관리. 최초 실행 시 macOS 접근성 권한 수동 부여 필요.
+
+## git 구조적 diff (difftastic)
+
+AST 기반 구조적 diff는 `~/.gitconfig`의 alias로 제공:
+
+```bash
+git dft HEAD~3            # 구조적 diff
+git dlog                   # 구조적 log
+git dshow COMMIT           # 구조적 show
+```
+기본 `git diff`는 여전히 `delta`(line-based + 사이드바이사이드).
+
 ## 일상 사용
 
 ```bash
@@ -107,7 +136,14 @@ chezmoi re-add ~/.zshrc     # 홈에서 편집한 내용을 역으로 소스에 
 
 `.chezmoiignore` 참고. 대표:
 - `Brewfile` — 소스엔 있지만 홈엔 배치 안 됨 (스크립트가 직접 참조)
-- `docs/` — 메모/가이드
+- `bootstrap.sh` — 새 맥 부트스트랩 스크립트, 홈 배치 불필요
+- `docs/` — 메모/가이드 (`docs/tools-guide.md` 포함)
 - `README.md` — 이 파일
+- `~/.ssh/config` — bootstrap이 초기 1회 작성 후 사용자 소유 (회사 GHE 추가 자유)
 - `~/.zshrc.d/secrets.zsh` — 아예 추가하지 않음 (머신별 시크릿)
 - `~/.ssh/id_ed25519*` — 개인키는 관리 밖
+
+## 참고 문서
+
+- `docs/tools-guide.md` — 설치된 모든 도구(Brewfile) + Unix 기본 명령어에 대한 빠른 레퍼런스
+- `docs/terminal-engineering-guide.md` — 터미널 엔지니어링 가이드
