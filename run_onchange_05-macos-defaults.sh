@@ -55,6 +55,23 @@ set_shortcut 65 false
 say "F1/F2 등 표준 function 키 모드 on"
 defaults write NSGlobalDomain com.apple.keyboard.fnState -bool true
 
+# ── 키 반복 속도 최소 ──
+# KeyRepeat: 반복 간격. 2 = 30ms (가장 빠름 중 안정값)
+# InitialKeyRepeat: 반복 시작 지연. 15 = 225ms
+# ApplePressAndHoldEnabled false: 악센트 선택 UI 비활성 (길게 누를 때 그냥 반복 입력)
+say "키 반복 속도 최소 (KeyRepeat=2, InitialKeyRepeat=15)"
+defaults write NSGlobalDomain KeyRepeat -int 2
+defaults write NSGlobalDomain InitialKeyRepeat -int 15
+defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
+
+# ── 트랙패드: 탭으로 클릭 (물리적 누름 대신) ──
+# 내장 트랙패드 + Bluetooth(Magic Trackpad 등) 둘 다 적용
+# NSGlobalDomain의 mouse.tapBehavior=1은 로그인 화면에서도 탭 클릭 허용
+say "트랙패드 탭 클릭 활성"
+defaults write com.apple.AppleMultitouchTrackpad Clicking -bool true
+defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
+defaults write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
+
 # ── cfprefsd 캐시 무효화 (변경 사항 즉시 반영) ──
 say "cfprefsd 재시작 (캐시 flush)"
 killall cfprefsd 2>/dev/null || true
