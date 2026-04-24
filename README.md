@@ -45,6 +45,10 @@ $EDITOR ~/.zshrc.d/secrets.zsh
 
 # 회사 머신이면: 회사 GitHub 계정용 SSH 키도 별도 생성/등록
 ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -C "hyounoh@your-company.co.kr"
+
+# Karabiner-Elements — sudo 프롬프트 필요한 cask라 Brewfile에서 제외됨.
+# 대화형 터미널에서 직접 설치 (설치 후 시스템 설정에서 접근성 권한 승인):
+brew install --cask karabiner-elements
 ```
 
 ### bootstrap.sh 수정 시 주의
