@@ -49,10 +49,12 @@ brew "doggo"        # 모던 DNS 클라이언트 (dig 대체)
 # ── 암호화 ──
 brew "openssl@3"    # LibreSSL보다 기능 풍부한 OpenSSL
 
-# ── JVM / Java ──
-# JDK는 mise로 관리 (cask temurin은 sudo 프롬프트 필요로 brew bundle에서 제외)
+# ── JVM / Java / Kotlin ──
+# JDK / Kotlin은 mise로 관리 (cask temurin은 sudo 프롬프트 필요로 brew bundle에서 제외)
 brew "gradle"       # Gradle 빌드 도구 (프로젝트 wrapper 없을 때)
-brew "mise"         # JDK·Node 등 런타임 버전 관리
+brew "mise"         # JDK·Kotlin·Node 등 런타임 버전 관리
+brew "ktlint"       # Kotlin 린터 + 포맷터
+brew "detekt"       # Kotlin 정적 분석
 
 # ── Python ──
 brew "uv"           # pip/poetry/pyenv 통합, 초고속 Python pkg/venv 매니저
@@ -62,6 +64,8 @@ brew "lazydocker"   # Docker TUI (docker CLI / compose는 Docker Desktop에 포�
 
 # ── DB 클라이언트 ──
 brew "mysql-client" # mysql CLI (서버 없이 클라이언트만)
+brew "libpq"        # PostgreSQL 클라이언트 — psql, pg_dump, pg_restore (keg-only)
+brew "pgcli"        # psql 대체 — autocomplete + syntax highlight
 brew "lazysql"      # DB TUI (MySQL/PostgreSQL/SQLite)
 brew "redis"        # redis-cli 포함
 
@@ -70,10 +74,14 @@ brew "kafka"        # kafka-topics.sh, kafka-console-consumer.sh 등 포함
 brew "kcat"         # 유연한 Kafka CLI (Avro / Schema Registry 지원)
 
 # ── 인프라 / 클라우드 ──
-brew "awscli"           # AWS CLI
-brew "saml2aws"         # SAML SSO → AWS 임시 크레덴셜
-brew "kubernetes-cli"   # kubectl
-brew "kubectx"          # k8s 컨텍스트/네임스페이스 전환
-brew "k9s"              # Kubernetes TUI
-brew "helm"             # k8s 패키지 매니저
-brew "eksctl"           # EKS 클러스터 관리
+brew "awscli"                      # AWS CLI (전 서비스 커버)
+brew "saml2aws"                    # SAML SSO → AWS 임시 크레덴셜
+brew "s5cmd"                       # S3 고속 병렬 CLI (aws s3보다 훨씬 빠름)
+brew "docker-credential-helper-ecr" # ECR 자동 로그인 (docker pull 투명)
+# session-manager-plugin은 brew cask가 2026-09 deprecation + Gatekeeper 이슈.
+# AWS 공식 pkg로 수동 설치: https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-install-plugin.html
+brew "kubernetes-cli"              # kubectl
+brew "kubectx"                     # k8s 컨텍스트/네임스페이스 전환
+brew "k9s"                         # Kubernetes TUI
+brew "helm"                        # k8s 패키지 매니저
+brew "eksctl"                      # EKS 클러스터 관리

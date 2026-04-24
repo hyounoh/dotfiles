@@ -326,6 +326,31 @@ gradle dependencies
 ./gradlew wrapper --gradle-version=8.5
 ```
 
+### Kotlin (mise 관리)
+`~/.config/mise/config.toml`에 `kotlin = "2.3"` 고정. `kotlinc`, `kotlin`, `kotlin-dsl` 제공.
+```bash
+kotlinc -version
+kotlin script.kts                        # 스크립트 실행
+echo 'fun main() { println("hi") }' | kotlinc -script -
+```
+
+### ktlint
+Kotlin 린터 + 포맷터 (공식 스타일 준수).
+```bash
+ktlint                                    # 현재 dir 검사
+ktlint -F                                 # 자동 수정
+ktlint "src/**/*.kt"                      # glob 지정
+ktlint --editorconfig=.editorconfig       # editorconfig 사용
+```
+
+### detekt
+Kotlin 정적 분석. 복잡도·스타일·잠재 버그 검출.
+```bash
+detekt --input src/                       # 분석
+detekt --generate-config                  # default config 생성
+detekt -c detekt.yml --baseline baseline.xml
+```
+
 ---
 
 ## 네트워크 / HTTP
@@ -613,8 +638,30 @@ mysql -h host -u user -p -e "SELECT NOW()"
 mysqldump -h host -u user -p db > dump.sql
 ```
 
+### libpq (`psql`, `pg_dump`, `pg_restore`)
+PostgreSQL 클라이언트. keg-only이므로 `tools.zsh`에서 PATH 추가됨.
+```bash
+psql -h host -U user -d db
+psql -h host -U user -d db -c "SELECT now()"
+pg_dump -h host -U user db > dump.sql
+pg_restore -h host -U user -d newdb dump.pgc
+psql postgres://user:pass@host/db          # URI 형식
+```
+
+### pgcli
+psql 대체. 자동완성 + 구문 하이라이트 + 멀티라인 쿼리.
+```bash
+pgcli -h host -U user -d db
+pgcli postgres://user:pass@host/db
+# 내장 meta:
+#   \d table       — 스키마
+#   \l             — 데이터베이스 목록
+#   \dt            — 테이블 목록
+#   F3             — multi-line 모드 토글
+```
+
 ### lazysql
-TUI로 MySQL/Postgres/SQLite 관리. alias: `lzs`.
+TUI로 MySQL/Postgres/SQLite 관리. alias: `lzs`. 연결 프로파일 저장 가능.
 
 ### redis-cli
 ```bash
@@ -709,13 +756,62 @@ eksctl utils write-kubeconfig --cluster=NAME
 ## AWS / 클라우드
 
 ### awscli (`aws`)
+모든 AWS 서비스 커버하는 범용 CLI.
 ```bash
+aws sts get-caller-identity              # 현재 자격증명 확인
+
+# S3
 aws s3 ls
 aws s3 cp file.tgz s3://bucket/
-aws ec2 describe-instances
-aws ecr get-login-password | docker login --username AWS --password-stdin <ecr-url>
-aws logs tail log-group --follow
-aws sts get-caller-identity              # 현재 자격증명 확인
+aws s3 sync ./local/ s3://bucket/path/ --dryrun
+aws s3 presign s3://bucket/key --expires-in 3600  # 임시 공유 URL
+
+# ECR
+aws ecr describe-repositories
+aws ecr list-images --repository-name myrepo
+aws ecr get-login-password | docker login --username AWS --password-stdin <account>.dkr.ecr.<region>.amazonaws.com
+
+# EC2 / ECS
+aws ec2 describe-instances --filters "Name=tag:Env,Values=prod"
+aws ecs list-clusters / aws ecs describe-services --cluster c --services s
+
+# CloudWatch Logs
+aws logs tail /aws/ecs/my-service --follow
+aws logs tail log-group --since 1h --filter-pattern '?ERROR ?WARN'
+```
+
+### s5cmd
+S3 고속 병렬 CLI — `aws s3`보다 10~20배 빠름 (bulk 작업에서).
+```bash
+s5cmd ls s3://bucket/
+s5cmd cp 'data/*' s3://bucket/dir/        # glob + 병렬 업로드
+s5cmd sync ./local/ s3://bucket/path/
+s5cmd cat s3://bucket/logs/2026-*.log | gzip -d | rg ERROR
+s5cmd du s3://bucket/                     # 총 사용량
+s5cmd --numworkers 256 cp ...              # 동시성 튜닝
+```
+
+### docker-credential-helper-ecr
+ECR에 매번 `aws ecr get-login-password | docker login` 안 해도 `docker pull` 자동 인증.
+```bash
+# 설정 (~/.docker/config.json):
+# {
+#   "credHelpers": {
+#     "<account>.dkr.ecr.<region>.amazonaws.com": "ecr-login"
+#   }
+# }
+# 이후:
+docker pull <account>.dkr.ecr.<region>.amazonaws.com/myrepo:tag   # 자동 인증
+```
+
+### session-manager-plugin (AWS SSM)
+SSH 키 없이 EC2/ECS 컨테이너 접속. AWS IAM 권한으로 인증.
+```bash
+aws ssm start-session --target i-0123456789abcdef0
+aws ssm start-session --target ecs:cluster_task_container
+aws ssm start-session --target i-xxx \
+  --document-name AWS-StartPortForwardingSession \
+  --parameters '{"portNumber":["3306"],"localPortNumber":["13306"]}'   # 포트 포워딩
 ```
 
 ### saml2aws

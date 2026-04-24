@@ -1,6 +1,7 @@
 # ── PATH ──────────────────────────────────────────────────
 export PATH="$HOME/.local/bin:$PATH"
 export PATH="$(brew --prefix)/opt/mysql-client/bin:$PATH"
+export PATH="$(brew --prefix)/opt/libpq/bin:$PATH"   # psql, pg_dump (keg-only)
 
 # ── fzf ──────────────────────────────────────────────────
 source <(fzf --zsh)
