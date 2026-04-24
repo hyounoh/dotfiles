@@ -74,17 +74,112 @@ Deploy Key는 서버 레벨에서 push를 거부하므로, 회사 맥에서 git 
 - dotfiles 내용 수정 → diff 저장 → 개인 맥으로 전달 → 거기서 commit/push
 - 또는 임시로 deploy key를 write 권한으로 업그레이드 (비권장)
 
-## 이직 시 체크리스트
+## 이직 시 체크리스트 / 새 회사 맥 개발 세팅
 
-새 회사 맥을 받으면:
-1. 부트스트랩 1줄 실행 → profile은 `work` 선택
+### Phase A — chezmoi 부트스트랩 (필수 기본기)
+
+1. **부트스트랩 1줄** 실행 → profile은 `work` 선택
 2. `git user.name` / `git user.email` 프롬프트에 **새 회사 정보** 입력
-3. `~/.ssh/config`에 새 회사 GHE 호스트 + 키 추가 (이 파일은 chezmoi가 관리 안 하므로 자유 편집)
-4. `~/.zshrc.d/secrets.zsh`에 새 회사 전용 환경변수/시크릿 채우기
+3. Karabiner 수동 설치 (Brewfile에 없음, sudo 프롬프트 필요):
+   ```bash
+   brew install --cask karabiner-elements
+   # 시스템 설정 → 개인정보 보호 및 보안 → 접근성 / 입력 모니터링에서
+   # Karabiner-Elements, karabiner_grabber, karabiner_observer 승인
+   ```
+4. `mise install` — 언어 런타임 설치 (mise.lock 기반, Java/Kotlin/Python/Node/Go/TS)
 
-구 회사 맥을 더 안 쓰게 되면:
+### Phase B — 회사 Git 계정 연결
+
+5. **회사용 SSH 키** 생성 + 회사 GitHub/GHE에 등록:
+   ```bash
+   ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -C "email@company.co.kr"
+   pbcopy < ~/.ssh/id_ed25519.pub
+   # 회사 GHE 또는 github.com 계정의 SSH Keys에 붙여넣기
+   ```
+6. **`~/.ssh/config`에 회사 host alias 추가** (chezmoi 관리 밖이라 자유 편집):
+   ```ssh-config
+   Host <회사-alias>
+     HostName <회사-GHE-호스트>
+     User git
+     IdentityFile ~/.ssh/id_ed25519
+     IdentitiesOnly yes
+   ```
+7. **`gh` CLI 회사 인증**:
+   ```bash
+   gh auth login --hostname <회사-GHE-호스트>
+   ```
+
+### Phase C — AWS / 클라우드 접근 (해당 시)
+
+8. **SAML SSO → 임시 자격증명**:
+   ```bash
+   saml2aws configure                         # 최초 설정
+   saml2aws login
+   aws sts get-caller-identity                # 검증
+   ```
+9. **Docker ECR 자동 로그인** (`~/.docker/config.json`):
+   ```json
+   { "credHelpers": { "<account>.dkr.ecr.<region>.amazonaws.com": "ecr-login" } }
+   ```
+10. **K8s 클러스터 등록** (EKS 기준):
+    ```bash
+    aws eks update-kubeconfig --name <cluster> --region <region>
+    kubectl config get-contexts
+    ```
+
+### Phase D — 추가 개발 도구
+
+11. **Docker Desktop** (Brewfile 밖):
+    ```bash
+    brew install --cask docker
+    open -a Docker    # 최초 실행 권한 승인, 리소스 할당 조정
+    ```
+12. **IDE** (IntelliJ IDEA):
+    ```bash
+    brew install --cask intellij-idea             # Ultimate
+    # 또는 intellij-idea-ce (Community)
+    ```
+    JDK path: `~/.local/share/mise/installs/java/temurin-21.*/`
+
+### Phase E — 프로젝트 & 시크릿
+
+13. **머신별 시크릿 채우기** — `$EDITOR ~/.zshrc.d/secrets.zsh`
+    (예: `DATABASE_URL`, `REDIS_URL`, `ANTHROPIC_BASE_URL`, 회사 프록시 등)
+14. **프로젝트 repo clone + 빌드**:
+    ```bash
+    git clone git@<회사-alias>:<org>/<repo>.git
+    cd <repo>
+    mise install                                # 프로젝트 mise.toml 있으면
+    ./gradlew build
+    docker compose up -d                         # 로컬 DB/Redis 필요 시
+    ```
+
+### Phase F — 회사 정책 종속
+
+15. VPN, 1Password, MFA 도구 등 회사 요구사항
+
+---
+
+### 구 회사 맥 정리 (이직 후 반납 전)
+
 - 개인 dotfiles repo의 Deploy Keys에서 해당 머신 키 삭제:
   https://github.com/hyounoh/dotfiles/settings/keys
+- 개인 SSH 키 전체 삭제 (`~/.ssh/id_ed25519_personal*`)
+- `~/.zshrc.d/secrets.zsh` 확인 후 제거 (회사 자격증명 남아있으면 안 됨)
+
+### 예상 소요 시간
+
+| Phase | 소요 |
+|-------|------|
+| A (chezmoi + Karabiner + mise) | ~15분 |
+| B (회사 Git) | ~10분 |
+| C (AWS/K8s) | ~20분 (팀별 편차 큼) |
+| D (Docker + IDE) | ~15분 |
+| E (프로젝트 빌드) | 프로젝트별 (대개 ~30분) |
+| F (사내 도구) | 회사 정책별 |
+| **Phase A~E 합계** | **약 1.5~2시간** |
+
+매 이직마다 위 절차가 **동일** — 개인 dotfiles가 변하지 않기 때문. 회사별 차이는 Phase B/C/E에만 존재.
 
 ## 환경변수 프로파일 (mise)
 
