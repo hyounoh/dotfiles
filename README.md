@@ -11,15 +11,17 @@ chezmoi로 관리하는 개발 환경 설정. 이 저장소는 **private**이므
 bash <(curl -fsSL https://gist.githubusercontent.com/hyounoh/38d3fcec52d6d194c69f2150a5aab089/raw/bootstrap.sh)
 ```
 
-스크립트가 자동으로 해주는 것:
-1. 개인 SSH 키 생성 (`~/.ssh/id_ed25519_personal`)
-2. 공개키를 클립보드에 복사 + GitHub SSH 설정 페이지 오픈
-3. 사용자가 키 등록하면 Enter → 임시 SSH config 작성 + 인증 테스트
-4. chezmoi 설치 + `git@github-personal:hyounoh/dotfiles.git` 기반 `init --apply`
+스크립트 동작:
+1. **profile 선택** — `personal` (내 개인 맥, read/write) vs `work` (회사 맥, read-only)
+2. SSH 키 생성 (`~/.ssh/id_ed25519_personal`)
+3. 공개키 클립보드 복사 + GitHub 등록 페이지 자동 오픈:
+   - personal → 개인 계정 SSH Key 등록
+   - work → dotfiles repo **Deploy Key** 등록 (write 권한 체크 해제)
+4. 임시 SSH config 작성 + 인증 테스트
+5. chezmoi 설치 + `git@github-personal:hyounoh/dotfiles.git` 기반 `init --apply --promptChoice profile=<선택값>`
 
-init 중 프롬프트:
-- `machine profile [personal,work]`: 머신 용도 선택 (기본 personal)
-- `git user.name` / `git user.email`: 기본값 표시됨, Enter로 수락
+init 중 추가 프롬프트:
+- `git user.name` / `git user.email`: profile에 맞는 기본값 표시, Enter로 수락
 
 자동 실행되는 chezmoi scripts:
 - Homebrew 설치 (없으면)
@@ -49,21 +51,18 @@ ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -C "hyounoh@your-company.co.kr"
 
 ## 프로파일과 git identity
 
-| profile | `~/.gitconfig`의 기본 identity |
-|---------|------------------------------|
-| `personal` (default) | `hyounoh <hyounoh@users.noreply.github.com>` |
-| `work` | `hyounoh <hyounoh@users.noreply.github.com>` |
+| profile | 용도 | 키 종류 | `~/.gitconfig` identity | push |
+|---------|------|---------|------------------------|------|
+| `personal` | 개인 맥 | 개인 계정 SSH Key | `hyounoh <hyounoh@users.noreply.github.com>` | ✅ |
+| `work` | 회사 맥 | dotfiles repo Deploy Key | `hyounoh <hyounoh@users.noreply.github.com>` | ❌ (서버 차단) |
 
-회사 머신(`work`)이어도 이 dotfiles 저장소 자체의 커밋은 개인 identity로 찍힘.
-bootstrap.sh가 chezmoi init 직후 아래 두 줄을 실행해서 repo-local 설정으로 박아둠:
+### 설계 원칙
+회사 맥은 **소비 전용(pull-only)**. 편집/커밋은 개인 맥에서만 하고, 회사 맥은 `chezmoi update`로 받아쓰기만.
+Deploy Key는 서버 레벨에서 push를 거부하므로, 회사 맥에서 git identity override 같은 복잡한 설정이 불필요함.
 
-```bash
-git -C "$(chezmoi source-path)" config user.name "hyounoh"
-git -C "$(chezmoi source-path)" config user.email "hyounoh@users.noreply.github.com"
-```
-
-회사 머신에서 **다른 개인 repo**를 clone하게 되면 기본 identity가 회사용이므로,
-해당 repo에서 `git config user.email hyounoh@users.noreply.github.com` 수동 설정 필요.
+### 회사 맥에서 편집해야 할 일이 생기면
+- dotfiles 내용 수정 → diff 저장 → 개인 맥으로 전달 → 거기서 commit/push
+- 또는 임시로 deploy key를 write 권한으로 업그레이드 (비권장)
 
 ## 환경변수 프로파일 (mise)
 
