@@ -21,9 +21,8 @@ bash <(curl -fsSL https://gist.githubusercontent.com/hyounoh/38d3fcec52d6d194c69
 5. chezmoi 설치 + `git@github-personal:hyounoh/dotfiles.git` 기반 `init --apply --promptChoice profile=<선택값>`
 
 init 중 추가 프롬프트:
-- `git user.name` / `git user.email`:
-  - personal profile → 개인 기본값(`hyounoh` / `hyounoh@users.noreply.github.com`) 제안, Enter로 수락
-  - work profile → 기본값 없음, 현재 회사 이메일/이름 명시적으로 입력
+- `git user.name` / `git user.email` — 두 프로필 모두 기본값 없음. 프로필에 맞는
+  이름/이메일을 명시적으로 입력 (personal은 개인 계정, work는 회사 계정).
 
 자동 실행되는 chezmoi scripts:
 - Homebrew 설치 (없으면) — `run_once_01`
@@ -60,7 +59,7 @@ brew install --cask karabiner-elements
 
 | profile | 용도 | 키 종류 | `~/.gitconfig` identity | push |
 |---------|------|---------|------------------------|------|
-| `personal` | 개인 맥 | 개인 계정 SSH Key | 기본값: `hyounoh <hyounoh@users.noreply.github.com>` | ✅ |
+| `personal` | 개인 맥 | 개인 계정 SSH Key | 프롬프트 입력값 (개인 계정) | ✅ |
 | `work` | 회사 맥 | dotfiles repo Deploy Key | 프롬프트 입력값 (소속마다 다름) | ❌ (서버 차단) |
 
 ### 설계 원칙
@@ -181,7 +180,41 @@ Deploy Key는 서버 레벨에서 push를 거부하므로, 회사 맥에서 git 
 
 매 이직마다 위 절차가 **동일** — 개인 dotfiles가 변하지 않기 때문. 회사별 차이는 Phase B/C/E에만 존재.
 
-## 환경변수 프로파일 (mise)
+## mise — 런타임 버전 + 환경변수
+
+### 전역 vs 프로젝트 런타임
+
+`~/.config/mise/config.toml`이 머신 전체 기본 런타임을 정의 (java 21, kotlin 2.3,
+python 3.13, node 22, go 1.25). Phase A의 `mise install`이 이걸 채움.
+
+repo clone 후의 `mise install`은 그 repo의 `.mise.toml` / `.tool-versions` /
+legacy 파일(`.java-version` 등)을 읽어 **부족한 것만** 채우는 멱등 명령.
+PATH는 mise shim이 프록시하므로 디렉터리 진입/이탈 시 JDK·Node 버전이 자동 전환됨.
+
+### 프로젝트에 mise 파일이 없을 때
+
+대부분의 기존 Java/Kotlin repo는 `.mise.toml`이 없음. 동작은 이렇게 분기:
+
+- **전역 설정이 fallback** — `mise install`은 사실상 no-op. 전역 버전이
+  프로젝트 요구와 같으면 그대로 빌드 가능.
+- **프로젝트 요구 버전이 전역과 다르면** `mise use`로 직접 핀:
+  ```bash
+  cd <repo>
+  mise use java=temurin-17   # .mise.toml 생성 + 설치 + 활성화를 한 번에
+  ```
+  여러 프로젝트의 JDK 버전이 섞여 있으면(예: 일부 17, 일부 21) repo마다
+  핀을 박아두면 디렉터리 전환만으로 JDK가 바뀌어 전환 비용 0.
+- **Gradle toolchain이 선언된 repo**는 Gradle이 알아서 필요한 JDK를 다운받음.
+  `build.gradle.kts`의 `jvmToolchain(...)` 또는 `languageVersion` 확인.
+  이 경우 mise 개입 불필요.
+
+clone 직후 판정용:
+```bash
+ls .mise.toml .tool-versions 2>/dev/null
+grep -E "jvmToolchain|languageVersion" build.gradle.kts 2>/dev/null
+```
+
+### 환경변수 프로파일
 
 DB 접속정보는 `~/.config/mise/config.{local,dev,prod}.toml`에 템플릿으로 존재:
 

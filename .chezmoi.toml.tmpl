@@ -1,16 +1,9 @@
 {{- /* machine profile: personal (default) or work */ -}}
 {{- $profile := promptChoiceOnce . "profile" "machine profile" (list "personal" "work") "personal" -}}
 
-{{- /* 개인은 회사가 바뀌어도 그대로지만 회사 identity는 소속마다 다르므로 default 없음 */ -}}
-{{- $defaultName  := "hyounoh" -}}
-{{- $defaultEmail := "hyounoh@users.noreply.github.com" -}}
-{{- if eq $profile "work" -}}
-{{-   $defaultName  = "" -}}
-{{-   $defaultEmail = "" -}}
-{{- end -}}
-
-{{- $name  := promptStringOnce . "name"  "git user.name"  $defaultName -}}
-{{- $email := promptStringOnce . "email" "git user.email" $defaultEmail -}}
+{{- /* 두 프로필 모두 사용자가 명시적으로 입력. 소스에 개인/회사 identity를 박지 않는다 */ -}}
+{{- $name  := promptStringOnce . "name"  "git user.name"  "" -}}
+{{- $email := promptStringOnce . "email" "git user.email" "" -}}
 
 [data]
     profile = {{ $profile | quote }}
