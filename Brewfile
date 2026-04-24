@@ -33,7 +33,8 @@ brew "shfmt"                    # 셸 스크립트 포맷터
 # ── 프롬프트 / 폰트 / 터미널 ──
 brew "starship"                 # 빠른 크로스쉘 프롬프트
 brew "chezmoi"                  # dotfiles 관리
-cask "font-meslo-lg-nerd-font"  # Nerd Font (eza/starship 아이콘)
+cask "font-meslo-lg-nerd-font"   # Nerd Font (eza/starship 아이콘, UI 폴백)
+cask "font-d2coding-nerd-font"   # ghostty/cmux 기본 font-family — 합자/한글 지원
 cask "ghostty"                  # 터미널 앱
 cask "cmux"                     # Ghostty 기반, AI 에이전트용 터미널
 cask "raycast"                  # Spotlight 대체 (clipboard history, window manager, snippet, AI)
