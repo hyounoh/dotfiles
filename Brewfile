@@ -15,6 +15,7 @@ brew "git"          # 최신 버전 (macOS 기본 git은 구버전)
 brew "gh"           # GitHub CLI: PR, issue, workflow 관리
 brew "lazygit"      # Git TUI
 brew "delta"        # git diff syntax highlight + side-by-side
+brew "difftastic"   # 구조적(AST) diff — git dft/dlog alias로 연동
 
 # ── 터미널 생산성 ──
 brew "tmux"                     # 터미널 세션 관리 / 분할 창
@@ -25,6 +26,9 @@ brew "atuin"                    # 히스토리 검색 DB (Ctrl-R 대체)
 brew "gum"                      # 스크립트용 TUI 컴포넌트 (choose/confirm/spin)
 brew "zsh-autosuggestions"      # zsh 명령어 자동완성 제안
 brew "zsh-syntax-highlighting"  # zsh 명령어 구문 하이라이팅
+brew "just"                     # 프로젝트별 명령어 집합 (Make 대체, 단순한 justfile 문법)
+brew "shellcheck"               # 셸 스크립트 정적 분석
+brew "shfmt"                    # 셸 스크립트 포맷터
 
 # ── 프롬프트 / 폰트 / 터미널 ──
 brew "starship"                 # 빠른 크로스쉘 프롬프트
@@ -32,6 +36,7 @@ brew "chezmoi"                  # dotfiles 관리
 cask "font-meslo-lg-nerd-font"  # Nerd Font (eza/starship 아이콘)
 cask "ghostty"                  # 터미널 앱
 cask "cmux"                     # Ghostty 기반, AI 에이전트용 터미널
+cask "raycast"                  # Spotlight 대체 (clipboard history, window manager, snippet, AI)
 
 # ── 네트워크 ──
 brew "wget"         # curl 대안 (파일 다운로드)
@@ -46,6 +51,9 @@ brew "openssl@3"    # LibreSSL보다 기능 풍부한 OpenSSL
 # JDK는 mise로 관리 (cask temurin은 sudo 프롬프트 필요로 brew bundle에서 제외)
 brew "gradle"       # Gradle 빌드 도구 (프로젝트 wrapper 없을 때)
 brew "mise"         # JDK·Node 등 런타임 버전 관리
+
+# ── Python ──
+brew "uv"           # pip/poetry/pyenv 통합, 초고속 Python pkg/venv 매니저
 
 # ── 컨테이너 ──
 brew "lazydocker"   # Docker TUI (docker CLI / compose는 Docker Desktop에 포함)
