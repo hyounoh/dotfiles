@@ -17,11 +17,13 @@ bash <(curl -fsSL https://gist.githubusercontent.com/hyounoh/38d3fcec52d6d194c69
 3. 공개키 클립보드 복사 + GitHub 등록 페이지 자동 오픈:
    - personal → 개인 계정 SSH Key 등록
    - work → dotfiles repo **Deploy Key** 등록 (write 권한 체크 해제)
-4. 임시 SSH config 작성 + 인증 테스트
+4. 임시 SSH config 작성 + 인증 테스트 (이후 chezmoi가 건드리지 않음 — 자유 편집 가능)
 5. chezmoi 설치 + `git@github-personal:hyounoh/dotfiles.git` 기반 `init --apply --promptChoice profile=<선택값>`
 
 init 중 추가 프롬프트:
-- `git user.name` / `git user.email`: profile에 맞는 기본값 표시, Enter로 수락
+- `git user.name` / `git user.email`:
+  - personal profile → 개인 기본값(`hyounoh` / `hyounoh@users.noreply.github.com`) 제안, Enter로 수락
+  - work profile → 기본값 없음, 현재 회사 이메일/이름 명시적으로 입력
 
 자동 실행되는 chezmoi scripts:
 - Homebrew 설치 (없으면)
@@ -53,16 +55,31 @@ ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -C "hyounoh@your-company.co.kr"
 
 | profile | 용도 | 키 종류 | `~/.gitconfig` identity | push |
 |---------|------|---------|------------------------|------|
-| `personal` | 개인 맥 | 개인 계정 SSH Key | `hyounoh <hyounoh@users.noreply.github.com>` | ✅ |
-| `work` | 회사 맥 | dotfiles repo Deploy Key | `hyounoh <hyounoh@users.noreply.github.com>` | ❌ (서버 차단) |
+| `personal` | 개인 맥 | 개인 계정 SSH Key | 기본값: `hyounoh <hyounoh@users.noreply.github.com>` | ✅ |
+| `work` | 회사 맥 | dotfiles repo Deploy Key | 프롬프트 입력값 (소속마다 다름) | ❌ (서버 차단) |
 
 ### 설계 원칙
 회사 맥은 **소비 전용(pull-only)**. 편집/커밋은 개인 맥에서만 하고, 회사 맥은 `chezmoi update`로 받아쓰기만.
 Deploy Key는 서버 레벨에서 push를 거부하므로, 회사 맥에서 git identity override 같은 복잡한 설정이 불필요함.
 
+소스는 **회사 중립적(company-agnostic)**. 특정 회사 이름/이메일이 소스에 하드코딩돼 있지 않아,
+이직해도 소스 수정 없이 같은 부트스트랩 흐름으로 새 회사 맥을 세팅할 수 있음.
+
 ### 회사 맥에서 편집해야 할 일이 생기면
 - dotfiles 내용 수정 → diff 저장 → 개인 맥으로 전달 → 거기서 commit/push
 - 또는 임시로 deploy key를 write 권한으로 업그레이드 (비권장)
+
+## 이직 시 체크리스트
+
+새 회사 맥을 받으면:
+1. 부트스트랩 1줄 실행 → profile은 `work` 선택
+2. `git user.name` / `git user.email` 프롬프트에 **새 회사 정보** 입력
+3. `~/.ssh/config`에 새 회사 GHE 호스트 + 키 추가 (이 파일은 chezmoi가 관리 안 하므로 자유 편집)
+4. `~/.zshrc.d/secrets.zsh`에 새 회사 전용 환경변수/시크릿 채우기
+
+구 회사 맥을 더 안 쓰게 되면:
+- 개인 dotfiles repo의 Deploy Keys에서 해당 머신 키 삭제:
+  https://github.com/hyounoh/dotfiles/settings/keys
 
 ## 환경변수 프로파일 (mise)
 

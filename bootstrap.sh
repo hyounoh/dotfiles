@@ -20,8 +20,8 @@ err() { printf "\033[1;31m[error]\033[0m %s\n" "$*" >&2; exit 1; }
 # ── 0. Profile 선택 ────────────────────────────────────────
 echo
 echo "이 머신 용도를 선택하세요:"
-echo "  1) personal       — 내 개인 맥 (read/write, 개인 GitHub 계정 SSH 키)"
-echo "  2) work  — 회사 맥 (read-only, dotfiles repo의 Deploy Key)"
+echo "  1) personal  — 내 개인 맥 (read/write, 개인 GitHub 계정 SSH 키)"
+echo "  2) work      — 회사 맥 (read-only, dotfiles repo의 Deploy Key)"
 echo
 read -r -p "[1/2, 기본 1]: " choice
 case "${choice:-1}" in
