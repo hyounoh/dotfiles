@@ -553,7 +553,7 @@ watch -d 'ls -la logs/'                 # 변경된 부분 강조 (-d)
 ```bash
 htop                    # 전체 프로세스 보기
 htop -p <PID>           # 특정 프로세스만
-htop -u user      # 특정 유저 프로세스만
+htop -u $(whoami)       # 특정 유저 프로세스만
 ```
 
 ```
