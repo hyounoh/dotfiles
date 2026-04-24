@@ -41,26 +41,29 @@ cask "raycast"                  # Spotlight 대체 (clipboard history, window ma
 # cask "karabiner-elements"  # brew bundle에서 sudo 프롬프트 블로킹 — 수동 설치 (README 참조)
 
 # ── 네트워크 ──
-brew "wget"         # curl 대안 (파일 다운로드)
-brew "nmap"         # 포트 스캔 / 네트워크 탐색
-brew "gping"        # ping 그래프 시각화
-brew "doggo"        # 모던 DNS 클라이언트 (dig 대체)
+brew "wget"              # curl 대안 (파일 다운로드)
+brew "nmap"              # 포트 스캔 / 네트워크 탐색
+brew "gping"             # ping 그래프 시각화
+brew "doggo"             # 모던 DNS 클라이언트 (dig 대체)
+cask "wireshark-app"     # GUI 패킷 분석 (tshark CLI 포함)
 
 # ── 암호화 ──
 brew "openssl@3"    # LibreSSL보다 기능 풍부한 OpenSSL
 
 # ── JVM / Java / Kotlin ──
 # JDK / Kotlin은 mise로 관리 (cask temurin은 sudo 프롬프트 필요로 brew bundle에서 제외)
-brew "gradle"       # Gradle 빌드 도구 (프로젝트 wrapper 없을 때)
-brew "mise"         # JDK·Kotlin·Node 등 런타임 버전 관리
-brew "ktlint"       # Kotlin 린터 + 포맷터
-brew "detekt"       # Kotlin 정적 분석
+brew "gradle"            # Gradle 빌드 도구 (프로젝트 wrapper 없을 때)
+brew "mise"              # JDK·Kotlin·Node 등 런타임 버전 관리
+brew "ktlint"            # Kotlin 린터 + 포맷터
+brew "detekt"            # Kotlin 정적 분석
+cask "intellij-idea"     # IntelliJ IDEA Ultimate (IDE)
 
 # ── Python ──
 brew "uv"           # pip/poetry/pyenv 통합, 초고속 Python pkg/venv 매니저
 
 # ── 컨테이너 ──
-brew "lazydocker"   # Docker TUI (docker CLI / compose는 Docker Desktop에 포함)
+# cask "docker"  # brew bundle에서 sudo 프롬프트 블로킹 — 수동 설치 (README 참조)
+brew "lazydocker"   # Docker TUI
 
 # ── DB 클라이언트 ──
 brew "mysql-client" # mysql CLI (서버 없이 클라이언트만)
@@ -85,3 +88,10 @@ brew "kubectx"                     # k8s 컨텍스트/네임스페이스 전환
 brew "k9s"                         # Kubernetes TUI
 brew "helm"                        # k8s 패키지 매니저
 brew "eksctl"                      # EKS 클러스터 관리
+
+# ── AI 도구 ──
+cask "claude-code"                 # Claude Code CLI (Anthropic 공식)
+
+# ── GUI 앱 (커뮤니케이션/브라우저) ──
+cask "slack"                       # Slack 데스크톱 클라이언트
+cask "google-chrome"               # Chrome 브라우저
