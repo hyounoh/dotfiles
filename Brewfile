@@ -38,6 +38,7 @@ cask "font-d2coding-nerd-font"   # ghostty/cmux 기본 font-family — 합자/�
 cask "ghostty"                  # 터미널 앱
 cask "cmux"                     # Ghostty 기반, AI 에이전트용 터미널
 cask "raycast"                  # Spotlight 대체 (clipboard history, window manager, snippet, AI)
+cask "karabiner-elements"       # 키보드 리맵 (Caps Lock ↔ Ctrl, Right Cmd → F18 등)
 
 # ── 네트워크 ──
 brew "wget"         # curl 대안 (파일 다운로드)
