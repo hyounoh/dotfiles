@@ -1,24 +1,20 @@
 # dotfiles
 
-chezmoi로 관리하는 개발 환경 설정. 이 저장소는 **private**이므로 새 맥에서
-부트스트랩하려면 개인 GitHub 계정의 SSH 키가 먼저 등록돼 있어야 한다.
+chezmoi로 관리하는 개발 환경 설정.
 
 ## 새 맥 부트스트랩
 
 한 줄로:
 
 ```bash
-bash <(curl -fsSL https://gist.githubusercontent.com/hyounoh/38d3fcec52d6d194c69f2150a5aab089/raw/bootstrap.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/hyounoh/dotfiles/main/bootstrap.sh)
 ```
 
 스크립트 동작:
 1. **profile 선택** — `personal` (내 개인 맥, read/write) vs `work` (회사 맥, read-only)
-2. SSH 키 생성 (`~/.ssh/id_ed25519_personal`)
-3. 공개키 클립보드 복사 + GitHub 등록 페이지 자동 오픈:
-   - personal → 개인 계정 SSH Key 등록
-   - work → dotfiles repo **Deploy Key** 등록 (write 권한 체크 해제)
-4. 임시 SSH config 작성 + 인증 테스트 (이후 chezmoi가 건드리지 않음 — 자유 편집 가능)
-5. chezmoi 설치 + `git@github-personal:hyounoh/dotfiles.git` 기반 `init --apply --promptChoice profile=<선택값>`
+2. `personal`: SSH 키 생성 (`~/.ssh/id_ed25519_personal`) → 개인 계정 SSH Key 등록 → SSH config 작성 + 인증 테스트
+   `work`: SSH 불필요 — HTTPS로 public repo clone
+3. chezmoi 설치 + `init --apply --promptChoice profile=<선택값>`
 
 init 중 추가 프롬프트:
 - `git user.name` / `git user.email` — 두 프로필 모두 기본값 없음. 프로필에 맞는
@@ -50,34 +46,27 @@ ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -C "hyounoh@your-company.co.kr"
 brew install --cask karabiner-elements
 ```
 
-### bootstrap.sh 수정 시 주의
-
-저장소 루트의 `bootstrap.sh`를 수정하면 위 gist 내용도 수동 갱신해야 함
-(gist는 별도 public mirror). gist URL: https://gist.github.com/hyounoh/38d3fcec52d6d194c69f2150a5aab089
-
 ## 프로파일과 git identity
 
-| profile | 용도 | 키 종류 | `~/.gitconfig` identity | push |
-|---------|------|---------|------------------------|------|
-| `personal` | 개인 맥 | 개인 계정 SSH Key | 프롬프트 입력값 (개인 계정) | ✅ |
-| `work` | 회사 맥 | dotfiles repo Deploy Key | 프롬프트 입력값 (소속마다 다름) | ❌ (서버 차단) |
+| profile | 용도 | dotfiles 접근 | `~/.gitconfig` identity | push |
+|---------|------|--------------|------------------------|------|
+| `personal` | 개인 맥 | SSH (`git@github-personal`) | 프롬프트 입력값 (개인 계정) | ✅ |
+| `work` | 회사 맥 | HTTPS (public repo) | 프롬프트 입력값 (소속마다 다름) | ❌ |
 
 ### 설계 원칙
 회사 맥은 **소비 전용(pull-only)**. 편집/커밋은 개인 맥에서만 하고, 회사 맥은 `chezmoi update`로 받아쓰기만.
-Deploy Key는 서버 레벨에서 push를 거부하므로, 회사 맥에서 git identity override 같은 복잡한 설정이 불필요함.
 
 소스는 **회사 중립적(company-agnostic)**. 특정 회사 이름/이메일이 소스에 하드코딩돼 있지 않아,
 이직해도 소스 수정 없이 같은 부트스트랩 흐름으로 새 회사 맥을 세팅할 수 있음.
 
 ### 회사 맥에서 편집해야 할 일이 생기면
 - dotfiles 내용 수정 → diff 저장 → 개인 맥으로 전달 → 거기서 commit/push
-- 또는 임시로 deploy key를 write 권한으로 업그레이드 (비권장)
 
 ## 이직 시 체크리스트 / 새 회사 맥 개발 세팅
 
 ### Phase A — chezmoi 부트스트랩 (필수 기본기)
 
-1. **부트스트랩 1줄** 실행 → profile은 `work` 선택
+1. **부트스트랩 1줄** 실행 → profile은 `work` 선택 (HTTPS로 clone, SSH 불필요)
 2. `git user.name` / `git user.email` 프롬프트에 **새 회사 정보** 입력
 3. Karabiner 수동 설치 (Brewfile에 없음, sudo 프롬프트 필요):
    ```bash
@@ -161,10 +150,8 @@ Deploy Key는 서버 레벨에서 push를 거부하므로, 회사 맥에서 git 
 
 ### 구 회사 맥 정리 (이직 후 반납 전)
 
-- 개인 dotfiles repo의 Deploy Keys에서 해당 머신 키 삭제:
-  https://github.com/hyounoh/dotfiles/settings/keys
-- 개인 SSH 키 전체 삭제 (`~/.ssh/id_ed25519_personal*`)
 - `~/.zshrc.d/secrets.zsh` 확인 후 제거 (회사 자격증명 남아있으면 안 됨)
+- 회사 SSH 키 삭제 (`~/.ssh/id_ed25519*`)
 
 ### 예상 소요 시간
 

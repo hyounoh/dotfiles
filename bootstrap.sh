@@ -1,14 +1,12 @@
 #!/usr/bin/env bash
-# hyounoh/dotfiles bootstrap — set up SSH key (personal or deploy),
-# register at GitHub, then install chezmoi and apply the private dotfiles repo.
-#
-# Public mirror (for curl|bash on fresh machines) kept in sync at:
-#   https://gist.github.com/hyounoh/38d3fcec52d6d194c69f2150a5aab089
-# When this file changes, paste the updated contents into that gist.
+# hyounoh/dotfiles bootstrap — set up a new Mac with chezmoi-managed dotfiles.
+# personal: generates SSH key for GitHub account (read/write push access)
+# work:     uses HTTPS (public repo, no auth needed for read-only pull)
 
 set -euo pipefail
 
-REPO_URL="git@github-personal:hyounoh/dotfiles.git"
+PERSONAL_REPO_URL="git@github-personal:hyounoh/dotfiles.git"
+HTTPS_REPO_URL="https://github.com/hyounoh/dotfiles.git"
 SSH_KEY_PATH="$HOME/.ssh/id_ed25519_personal"
 
 say() { printf "\033[1;34m[bootstrap]\033[0m %s\n" "$*"; }
@@ -21,7 +19,7 @@ err() { printf "\033[1;31m[error]\033[0m %s\n" "$*" >&2; exit 1; }
 echo
 echo "이 머신 용도를 선택하세요:"
 echo "  1) personal  — 내 개인 맥 (read/write, 개인 GitHub 계정 SSH 키)"
-echo "  2) work      — 회사 맥 (read-only, dotfiles repo의 Deploy Key)"
+echo "  2) work      — 회사 맥 (read-only, HTTPS clone)"
 echo
 read -r -p "[1/2, 기본 1]: " choice
 case "${choice:-1}" in
@@ -31,47 +29,35 @@ case "${choice:-1}" in
 esac
 say "선택된 profile: $PROFILE"
 
-if [[ "$PROFILE" == "work" ]]; then
-  KEY_COMMENT="hyounoh-dotfiles-deploy"
-  REG_URL="https://github.com/hyounoh/dotfiles/settings/keys/new"
-  REG_INSTRUCTIONS="Repo Deploy Key로 등록 (read-only):
-    * 위 URL에서 Title 입력, Key에 공개키 붙여넣기
-    * 'Allow write access' 체크박스 해제 유지"
-else
-  KEY_COMMENT="hyounoh-personal"
-  REG_URL="https://github.com/settings/ssh/new"
-  REG_INSTRUCTIONS="개인 계정 SSH Key로 등록:
-    * 위 URL에서 Title 입력, Key에 공개키 붙여넣기"
-fi
+if [[ "$PROFILE" == "personal" ]]; then
+  # ── 1. SSH 키 생성 ─────────────────────────────────────────
+  if [[ ! -f "$SSH_KEY_PATH" ]]; then
+    say "SSH 키 생성 중 ($SSH_KEY_PATH)"
+    mkdir -p "$HOME/.ssh" && chmod 700 "$HOME/.ssh"
+    ssh-keygen -t ed25519 -f "$SSH_KEY_PATH" -C "hyounoh-personal" -N ""
+  else
+    say "SSH 키 이미 존재: $SSH_KEY_PATH"
+  fi
 
-# ── 1. SSH 키 생성 ─────────────────────────────────────────
-if [[ ! -f "$SSH_KEY_PATH" ]]; then
-  say "SSH 키 생성 중 ($SSH_KEY_PATH, comment: $KEY_COMMENT)"
-  mkdir -p "$HOME/.ssh" && chmod 700 "$HOME/.ssh"
-  ssh-keygen -t ed25519 -f "$SSH_KEY_PATH" -C "$KEY_COMMENT" -N ""
-else
-  say "SSH 키 이미 존재: $SSH_KEY_PATH"
-fi
+  # ── 2. 공개키를 GitHub에 등록 ──────────────────────────────
+  echo
+  cat "$SSH_KEY_PATH.pub"
+  echo
+  if command -v pbcopy >/dev/null 2>&1; then
+    pbcopy < "$SSH_KEY_PATH.pub"
+    say "공개키가 클립보드에 복사됐습니다."
+  fi
+  say "GitHub SSH 등록 페이지를 엽니다: https://github.com/settings/ssh/new"
+  echo "  Title 입력, Key에 공개키 붙여넣기"
+  open "https://github.com/settings/ssh/new" 2>/dev/null || true
+  read -r -p "등록 완료 후 Enter를 누르세요... " _
 
-# ── 2. 공개키를 GitHub에 등록 ──────────────────────────────
-echo
-cat "$SSH_KEY_PATH.pub"
-echo
-if command -v pbcopy >/dev/null 2>&1; then
-  pbcopy < "$SSH_KEY_PATH.pub"
-  say "공개키가 클립보드에 복사됐습니다."
-fi
-echo "$REG_INSTRUCTIONS"
-say "GitHub 등록 페이지를 엽니다: $REG_URL"
-open "$REG_URL" 2>/dev/null || true
-read -r -p "등록 완료 후 Enter를 누르세요... " _
-
-# ── 3. 임시 SSH config ─────────────────────────────────────
-if ! grep -q "Host github-personal" "$HOME/.ssh/config" 2>/dev/null; then
-  say "임시 SSH config에 github-personal alias 추가"
-  touch "$HOME/.ssh/config"
-  chmod 600 "$HOME/.ssh/config"
-  cat >> "$HOME/.ssh/config" <<EOF
+  # ── 3. 임시 SSH config ─────────────────────────────────────
+  if ! grep -q "Host github-personal" "$HOME/.ssh/config" 2>/dev/null; then
+    say "임시 SSH config에 github-personal alias 추가"
+    touch "$HOME/.ssh/config"
+    chmod 600 "$HOME/.ssh/config"
+    cat >> "$HOME/.ssh/config" <<EOF
 
 Host github-personal
   HostName github.com
@@ -79,18 +65,22 @@ Host github-personal
   IdentityFile $SSH_KEY_PATH
   IdentitiesOnly yes
 EOF
-else
-  say "SSH config의 github-personal alias 이미 존재"
-fi
+  else
+    say "SSH config의 github-personal alias 이미 존재"
+  fi
 
-# ── 4. SSH 인증 테스트 ────────────────────────────────────
-say "GitHub SSH 인증 확인 중..."
-if ! ssh -o StrictHostKeyChecking=accept-new -T git@github-personal 2>&1 \
-      | grep -qE "(successfully authenticated|Invalid user)"; then
-  err "SSH 인증 실패. 공개키가 GitHub에 등록됐는지 확인하세요."
+  # ── 4. SSH 인증 테스트 ────────────────────────────────────
+  say "GitHub SSH 인증 확인 중..."
+  if ! ssh -o StrictHostKeyChecking=accept-new -T git@github-personal 2>&1 \
+        | grep -q "successfully authenticated"; then
+    err "SSH 인증 실패. 공개키가 GitHub에 등록됐는지 확인하세요."
+  fi
+  say "SSH 인증 성공"
+
+  REPO_URL="$PERSONAL_REPO_URL"
+else
+  REPO_URL="$HTTPS_REPO_URL"
 fi
-# Deploy key는 "Invalid user hyounoh" 메시지와 함께 성공 — 이것도 정상 인증
-say "SSH 인증 성공"
 
 # ── 5. chezmoi 설치 + 적용 ─────────────────────────────────
 say "chezmoi 설치 및 dotfiles 적용 (수 분 소요)"
