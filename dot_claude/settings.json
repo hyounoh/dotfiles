@@ -1,0 +1,79 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/fetch-issue.sh"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/validate-branch.sh",
+            "if": "Bash(git checkout -b*)"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/validate-branch.sh",
+            "if": "Bash(git switch -c*)"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/track-pr.sh",
+            "if": "Bash(gh pr create*)"
+          }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/check-verify.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/enforce-wrapup.sh"
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "bash ~/.claude/statusline-command.sh"
+  },
+  "enabledPlugins": {
+    "github@claude-plugins-official": true,
+    "frontend-design@claude-plugins-official": true,
+    "supabase@claude-plugins-official": true,
+    "context7@claude-plugins-official": true,
+    "claude-md-management@claude-plugins-official": true
+  },
+  "language": "english",
+  "effortLevel": "medium",
+  "skipDangerousModePermissionPrompt": true,
+  "model": "sonnet"
+}

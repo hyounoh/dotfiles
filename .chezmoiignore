@@ -2,3 +2,13 @@ Brewfile
 bootstrap.sh
 docs/
 README.md
+
+dot_claude/**
+!dot_claude/settings.json
+!dot_claude/CLAUDE.md
+!dot_claude/keybindings.json
+!dot_claude/statusline-command.sh
+!dot_claude/hooks
+!dot_claude/hooks/**
+!dot_claude/skills
+!dot_claude/skills/**
