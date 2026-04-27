@@ -264,5 +264,4 @@ chezmoi re-add ~/.zshrc     # 홈에서 편집한 내용을 역으로 소스에 
 
 ## 참고 문서
 
-- `docs/tools-guide.md` — 설치된 모든 도구(Brewfile) + Unix 기본 명령어에 대한 빠른 레퍼런스
-- `docs/terminal-engineering-guide.md` — 터미널 엔지니어링 가이드
+- `docs/tools-guide.md` — CLI 도구 카탈로그(Brewfile) + Unix 기본 명령어 + 백엔드 엔지니어 파이프라인 패턴 통합 레퍼런스
