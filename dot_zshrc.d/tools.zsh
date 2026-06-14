@@ -12,9 +12,6 @@ export PATH="$BREW_PREFIX/opt/libpq/bin:$PATH"   # psql, pg_dump (keg-only)
 # ── fzf ──────────────────────────────────────────────────
 command -v fzf >/dev/null && source <(fzf --zsh)
 
-# ── mise (런타임 버전 관리) ──────────────────────────────
-command -v mise >/dev/null && eval "$(mise activate zsh)"
-
 # ── zoxide (cd 대체) ──────────────────────────────────────
 command -v zoxide >/dev/null && eval "$(zoxide init zsh --cmd cd)"
 # autosuggestions/highlighting/starship가 의도적으로 zoxide init 뒤에 와야 하므로

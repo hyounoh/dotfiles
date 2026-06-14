@@ -1,4 +1,0 @@
-[env]
-DB_USER = "REPLACE_ME_prod_user"
-DB_HOST = "REPLACE_ME_prod_host:3306"
-DB_PASS = "REPLACE_ME_prod_pass"

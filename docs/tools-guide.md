@@ -487,19 +487,7 @@ done
 
 ## 언어 런타임
 
-### mise
-다국어 런타임 버전 관리.
-```bash
-mise ls                                         # 설치된 것
-mise ls-remote java                             # 사용 가능 버전
-mise use -g java@21 node@22                     # 전역 설치 + 사용
-mise use java@17                                # 현재 디렉토리 고정 (mise.toml)
-mise install                                    # mise.toml 일괄 설치
-mise current                                    # 지금 유효한 버전
-mise env                                        # 주입되는 PATH/환경변수
-mise lock -g                                    # lockfile 재생성
-```
-이 dotfiles에서 관리: java 21, python 3.13, node 22, go 1.25, TypeScript.
+> 런타임은 전역으로 통일하지 않고 프로젝트별로 관리한다 (이 dotfiles는 버전 매니저를 두지 않음).
 
 ### uv
 Python pkg/venv 매니저 (pip+poetry+pyenv 통합, 초고속).
@@ -548,8 +536,8 @@ rm -rf ~/.gradle/caches
 ./gradlew wrapper --gradle-version=8.5
 ```
 
-### Kotlin (mise 관리)
-`~/.config/mise/config.toml`에 `kotlin = "2.3"` 고정.
+### Kotlin
+런타임은 이 dotfiles에서 설치하지 않음 — Gradle toolchain 또는 프로젝트별 설치 사용.
 ```bash
 kotlinc -version
 kotlin script.kts                               # 스크립트 실행
@@ -1765,9 +1753,6 @@ eval "$(atuin init zsh --disable-up-arrow)"
 # fzf 키바인딩
 source <(fzf --zsh)
 
-# mise 활성화
-eval "$(mise activate zsh)"
-
 # starship 프롬프트
 eval "$(starship init zsh)"
 ```
@@ -1780,13 +1765,6 @@ alias:
   dft   = -c diff.external=difft diff
   dlog  = -c diff.external=difft log --ext-diff
   dshow = -c diff.external=difft show --ext-diff
-```
-
-### mise 환경 프로파일 (`~/.config/mise/config.{env}.toml`)
-```bash
-MISE_ENV=local mise env                         # DB_USER/HOST/PASS 주입
-MISE_ENV=dev   ...
-MISE_ENV=prod  ...
 ```
 
 ---
@@ -1808,7 +1786,6 @@ MISE_ENV=prod  ...
 - [jq tutorial](https://stedolan.github.io/jq/tutorial/)
 - [tmux cheatsheet](https://tmuxcheatsheet.com/)
 - [just manual](https://just.systems/man/en/)
-- [mise docs](https://mise.jdx.dev/)
 - [uv docs](https://docs.astral.sh/uv/)
 - [Raycast Store](https://www.raycast.com/store)
 

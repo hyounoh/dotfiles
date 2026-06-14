@@ -51,9 +51,8 @@ cask "wireshark-app"     # GUI 패킷 분석 (tshark CLI 포함)
 brew "openssl@3"    # LibreSSL보다 기능 풍부한 OpenSSL
 
 # ── JVM / Java / Kotlin ──
-# JDK / Kotlin은 mise로 관리 (cask temurin은 sudo 프롬프트 필요로 brew bundle에서 제외)
+# 언어 런타임(JDK/Kotlin/Node/Python/Go 등)은 전역 통일하지 않고 프로젝트별로 관리.
 brew "gradle"            # Gradle 빌드 도구 (프로젝트 wrapper 없을 때)
-brew "mise"              # JDK·Kotlin·Node 등 런타임 버전 관리
 brew "ktlint"            # Kotlin 린터 + 포맷터
 brew "detekt"            # Kotlin 정적 분석
 

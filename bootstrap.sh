@@ -93,7 +93,6 @@ echo
 say "부트스트랩 완료. 후속 수동 단계:"
 cat <<'EOF'
   1. 새 셸 띄우기 (zsh plugins/aliases 로드)
-  2. mise install                         # 언어 런타임 설치 (mise.lock 기반)
-  3. $EDITOR ~/.zshrc.d/secrets.zsh        # 시크릿 값 채우기
-  4. (회사 맥) 회사 GitHub 계정용 SSH 키 별도 생성 + 등록
+  2. $EDITOR ~/.zshrc.d/secrets.zsh        # 시크릿 값 채우기
+  3. (회사 맥) 회사 GitHub 계정용 SSH 키 별도 생성 + 등록
 EOF

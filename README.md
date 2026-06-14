@@ -32,9 +32,6 @@ init 중 추가 프롬프트:
 ```bash
 # 새 셸 띄우기 (zsh plugins/aliases 로드)
 
-# 언어 런타임 설치 (mise.lock 기반)
-mise install
-
 # 머신별 시크릿 값 채우기
 $EDITOR ~/.zshrc.d/secrets.zsh
 
@@ -74,7 +71,6 @@ brew install --cask karabiner-elements
    # 시스템 설정 → 개인정보 보호 및 보안 → 접근성 / 입력 모니터링에서
    # Karabiner-Elements, karabiner_grabber, karabiner_observer 승인
    ```
-4. `mise install` — 언어 런타임 설치 (mise.lock 기반, Java/Kotlin/Python/Node/Go/TS)
 
 ### Phase B — 회사 Git 계정 연결
 
@@ -131,7 +127,6 @@ brew install --cask karabiner-elements
     ```bash
     git clone git@<회사-alias>:<org>/<repo>.git
     cd <repo>
-    mise install                                # 프로젝트 mise.toml 있으면
     ./gradlew build
     docker compose up -d                         # 로컬 DB/Redis 필요 시
     ```
@@ -151,7 +146,7 @@ brew install --cask karabiner-elements
 
 | Phase | 소요 |
 |-------|------|
-| A (chezmoi + Karabiner + mise) | ~15분 |
+| A (chezmoi + Karabiner) | ~15분 |
 | B (회사 Git) | ~10분 |
 | C (AWS/K8s) | ~20분 (팀별 편차 큼) |
 | D (Docker) | ~15분 |
@@ -161,48 +156,12 @@ brew install --cask karabiner-elements
 
 매 이직마다 위 절차가 **동일** — 개인 dotfiles가 변하지 않기 때문. 회사별 차이는 Phase B/C/E에만 존재.
 
-## mise — 런타임 버전 + 환경변수
+## 언어 런타임
 
-### 전역 vs 프로젝트 런타임
-
-`~/.config/mise/config.toml`이 머신 전체 기본 런타임을 정의 (java 21, kotlin 2.3,
-python 3.13, node 22, go 1.25). Phase A의 `mise install`이 이걸 채움.
-
-repo clone 후의 `mise install`은 그 repo의 `.mise.toml` / `.tool-versions` /
-legacy 파일(`.java-version` 등)을 읽어 **부족한 것만** 채우는 멱등 명령.
-PATH는 mise shim이 프록시하므로 디렉터리 진입/이탈 시 JDK·Node 버전이 자동 전환됨.
-
-### 프로젝트에 mise 파일이 없을 때
-
-대부분의 기존 Java/Kotlin repo는 `.mise.toml`이 없음. 동작은 이렇게 분기:
-
-- **전역 설정이 fallback** — `mise install`은 사실상 no-op. 전역 버전이
-  프로젝트 요구와 같으면 그대로 빌드 가능.
-- **프로젝트 요구 버전이 전역과 다르면** `mise use`로 직접 핀:
-  ```bash
-  cd <repo>
-  mise use java=temurin-17   # .mise.toml 생성 + 설치 + 활성화를 한 번에
-  ```
-  여러 프로젝트의 JDK 버전이 섞여 있으면(예: 일부 17, 일부 21) repo마다
-  핀을 박아두면 디렉터리 전환만으로 JDK가 바뀌어 전환 비용 0.
-- **Gradle toolchain이 선언된 repo**는 Gradle이 알아서 필요한 JDK를 다운받음.
-  `build.gradle.kts`의 `jvmToolchain(...)` 또는 `languageVersion` 확인.
-  이 경우 mise 개입 불필요.
-
-clone 직후 판정용:
-```bash
-ls .mise.toml .tool-versions 2>/dev/null
-grep -E "jvmToolchain|languageVersion" build.gradle.kts 2>/dev/null
-```
-
-### 환경변수 프로파일
-
-DB 접속정보는 `~/.config/mise/config.{local,dev,prod}.toml`에 템플릿으로 존재:
-
-```bash
-export MISE_ENV=dev        # or local, prod
-echo $DB_USER              # 해당 환경 값 주입
-```
+런타임(JDK/Kotlin/Node/Python/Go 등)은 **전역으로 통일하지 않는다** — 프로젝트마다
+요구 버전이 너무 달라 dotfiles 차원의 단일 핀이 의미가 없기 때문. 각 프로젝트에서
+필요한 방식으로 설치·고정한다 (Gradle toolchain, 프로젝트별 버전 매니저, 직접 설치 등).
+머신/회사별 DB 접속정보 등 환경변수는 `~/.zshrc.d/secrets.zsh`에 둔다.
 
 ## macOS 시스템 설정 자동화
 
