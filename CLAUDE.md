@@ -11,11 +11,12 @@
 When given a GitHub issue number (e.g. `#123`), follow these steps in order:
 
 1. **Analyze**: Read the issue content from context. Clarify requirements before touching code.
-2. **Branch**: Create a branch named `issue-{number}-{short-description}` from main.
+2. **Branch**: Create a branch named `issue-{number}-{short-description}` from the latest main (`git checkout main && git pull && git checkout -b ...`).
 3. **Implement**: Make changes according to the issue requirements.
 4. **Verify**: Run tests and lint. Fix all failures before proceeding.
 5. **PR**: Create a PR with the issue number in the title and body.
 6. **Wrap up**: Update CLAUDE.md if any new conventions or patterns were introduced.
+7. **Stay**: Remain on the feature branch (do **not** switch back to main) so the change can be verified locally. Correctness of the next task is guaranteed by step 2 (branch from latest main), not by returning to main. Prune local branches whose remote is gone (`git fetch -p`, delete `[gone]` branches — skip any with unpushed work and report them).
 
 Do not skip steps. Do not create a PR if tests or lint are failing.
 
@@ -24,11 +25,12 @@ Do not skip steps. Do not create a PR if tests or lint are failing.
 When given a Prompt from user (e.g. `Add tests and increase test coverage`), follow these steps in order:
 
 1. **Analyze**: Read the prompt. Clarify requirements before touching code.
-2. **Branch**: Create a branch named `task-{short-description}` from main.
+2. **Branch**: Create a branch named `{type}/{short-description}` (e.g. `feat/add-tests`) from the latest main (`git checkout main && git pull && git checkout -b ...`).
 3. **Implement**: Make changes according to the requirements.
 4. **Verify**: Run tests and lint. Fix all failures before proceeding.
 5. **PR**: Create a PR with the description in the title and body.
 6. **Wrap up**: Update CLAUDE.md if any new conventions or patterns were introduced.
+7. **Stay**: Remain on the feature branch (do **not** switch back to main) so the change can be verified locally. Correctness of the next task is guaranteed by step 2 (branch from latest main), not by returning to main. Prune local branches whose remote is gone (`git fetch -p`, delete `[gone]` branches — skip any with unpushed work and report them).
 
 ---
 
@@ -96,8 +98,17 @@ docs: CLAUDE.md 최신화
 ### 브랜치 전략
 
 - `main` 브랜치는 보호되어 있어 직접 push 불가. 반드시 feature 브랜치에서 작업 후 Pull Request로만 merge.
-- 브랜치 네이밍: `feat/`, `fix/`, `refactor/`, `docs/` 등 접두어 사용.
-- **신규 feature는 반드시 최신 `main` 브랜치를 기준으로 신규 브랜치를 생성해서 작업한다** (`git checkout main && git pull && git checkout -b feat/new-feature`).
+- 브랜치 네이밍: `feat/`, `fix/`, `refactor/`, `docs/`, `test/`, `chore/`, `hotfix/` 접두어 사용. 이슈 기반 작업은 `issue-{number}-{short-description}`.
+- **신규 작업은 반드시 최신 `main` 브랜치를 기준으로 신규 브랜치를 생성해서 작업한다** (`git checkout main && git pull && git checkout -b feat/new-feature`). 다음 작업의 정합성은 이 "최신 main에서 분기" 단계가 보장하므로, 작업 후 main으로 복귀할 필요가 없다.
+- 작업(PR 생성)이 끝나면 **feature 브랜치에 그대로 머문다**(main으로 복귀하지 않는다) — 로컬에서 변경 사항을 확인할 수 있도록. 원격에서 삭제된 `[gone]` 로컬 브랜치만 정리한다(`git fetch -p`).
+
+### 브랜치 생성 강제 (Hook)
+
+`git checkout -b` / `git switch -c` 는 PreToolUse 훅(`~/.claude/hooks/validate-branch.sh`)이 검증한다:
+- **네이밍**: 이슈 작업 중이면 `issue-{N}` 포함 필수, 그 외엔 위 접두어 필수.
+- **더티 워크트리**: 추적 파일에 커밋 안 된 변경이 있으면 차단 — 사용자에게 상태를 보여주고 stash/commit/폐기 여부를 물어본 뒤 진행한다.
+- **베이스 검증**: 권장 복합 명령(`git checkout main && git pull && git checkout -b ...`)이 아니면, 현재 브랜치가 최신 main(origin/main과 동기화)일 때만 생성 허용.
+- **예외(스택 브랜치)**: 사용자가 명시적으로 기존 브랜치 위 분기를 요청한 경우에만 `touch ~/.claude/.skip-branch-validation` 후 생성 (1회용 플래그).
 
 ---
 
