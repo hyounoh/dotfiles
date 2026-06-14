@@ -15,7 +15,7 @@ Brewfile로 설치되는 것 + 이 dotfiles의 alias/설정 + Unix 기본 명령
 - [Kafka](#kafka)
 - [컨테이너 / Kubernetes](#컨테이너--kubernetes)
 - [AWS / 클라우드](#aws--클라우드)
-- [IDE / 에디터](#ide--에디터)
+- [에디터](#에디터)
 - [AI 도구](#ai-도구)
 - [터미널 앱 / 프롬프트 / 폰트](#터미널-앱--프롬프트--폰트)
 - [GUI 앱 (macOS)](#gui-앱-macos)
@@ -1229,7 +1229,7 @@ saml2aws login --role=arn:aws:iam::...
 
 ---
 
-## IDE / 에디터
+## 에디터
 
 ### vim
 ```bash
@@ -1250,17 +1250,6 @@ vim +/pattern file.kt                           # 패턴 위치
 선택:    v 문자,  V 줄,  Ctrl-v 블록 — 후 d/y/>
 분할:    :split / :vsplit,  Ctrl-w w 창 전환,  :q 닫기
 ```
-
-### IntelliJ IDEA (`intellij-idea`, cask)
-JetBrains IDE Ultimate. Kotlin/Java/Spring 메인.
-```bash
-idea .                                          # 현재 디렉토리 (Toolbox shell script 활성 시)
-idea diff a.kt b.kt
-idea merge LOCAL REMOTE BASE MERGED
-```
-- 설정 동기화: JetBrains Account Settings Sync
-- 플러그인: Kotlin (번들), Database Tools, Docker, Kubernetes, GitToolBox
-- mise 통합 플러그인 권장 (`~/.config/mise/config.toml`의 JDK를 Project SDK로 자동 인식)
 
 ---
 
@@ -1621,7 +1610,6 @@ cat ~/.ssh/id_rsa.pub | pbcopy
 # 파일/URL 열기
 open .                                          # Finder
 open ./build/reports/tests/                     # HTML
-open -a "IntelliJ IDEA" .
 open https://github.com
 
 # 시스템 정보

@@ -56,7 +56,6 @@ brew "gradle"            # Gradle 빌드 도구 (프로젝트 wrapper 없을 때
 brew "mise"              # JDK·Kotlin·Node 등 런타임 버전 관리
 brew "ktlint"            # Kotlin 린터 + 포맷터
 brew "detekt"            # Kotlin 정적 분석
-cask "intellij-idea"     # IntelliJ IDEA Ultimate (IDE)
 
 # ── Python ──
 brew "uv"           # pip/poetry/pyenv 통합, 초고속 Python pkg/venv 매니저

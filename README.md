@@ -122,12 +122,6 @@ brew install --cask karabiner-elements
     brew install --cask docker
     open -a Docker    # 최초 실행 권한 승인, 리소스 할당 조정
     ```
-12. **IDE** (IntelliJ IDEA):
-    ```bash
-    brew install --cask intellij-idea             # Ultimate
-    # 또는 intellij-idea-ce (Community)
-    ```
-    JDK path: `~/.local/share/mise/installs/java/temurin-21.*/`
 
 ### Phase E — 프로젝트 & 시크릿
 
@@ -160,7 +154,7 @@ brew install --cask karabiner-elements
 | A (chezmoi + Karabiner + mise) | ~15분 |
 | B (회사 Git) | ~10분 |
 | C (AWS/K8s) | ~20분 (팀별 편차 큼) |
-| D (Docker + IDE) | ~15분 |
+| D (Docker) | ~15분 |
 | E (프로젝트 빌드) | 프로젝트별 (대개 ~30분) |
 | F (사내 도구) | 회사 정책별 |
 | **Phase A~E 합계** | **약 1.5~2시간** |
