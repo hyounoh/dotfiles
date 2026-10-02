@@ -1252,9 +1252,8 @@ claude --resume                                 # 직전 세션 이어가기
 claude /help
 ```
 - 프로젝트 메모리: `<repo>/CLAUDE.md`
-- 글로벌 메모리/스킬/에이전트: `~/.claude/` (별도 저장소 `claude-skills`로 관리, symlink 배포)
-- MCP 서버: `~/.claude/mcps` (별도 저장소로 관리, symlink 배포)
-- 설정: `~/.claude/settings.json`
+- 글로벌 설정·메모리·개인 스킬·Codex 설정: `~/agent-config` (private repo `hyounoh/agent-config`)가 원본이고 `~/.claude/`, `~/.codex/`, `~/CLAUDE.md`는 그쪽으로의 symlink. 이 dotfiles 저장소는 에이전트 설정을 관리하지 않는다 (2026-10-02 분리)
+- 새 기기: `git clone git@github.com:hyounoh/agent-config.git ~/agent-config && bash ~/agent-config/bin/bootstrap.sh`
 
 ---
 
