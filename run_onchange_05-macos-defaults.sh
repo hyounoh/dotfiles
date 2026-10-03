@@ -63,33 +63,13 @@ set_shortcut() {
 
 say "적용 시작"
 
-# ── 입력 소스 단축키 ──
-try "symbolichotkey 60 (이전 입력 소스) 비활성" \
-  set_shortcut 60 false
-
-# 61: "입력 메뉴에서 다음 소스 선택" → F18
-#   parameters = [char=65535(none), keycode=79(F18), modifiers=8388608(fn)]
-#   Karabiner에서 Right Command → F18 리매핑과 조합해 한/영 전환 트리거
-try "symbolichotkey 61 (다음 입력 소스) → F18" \
-  set_shortcut 61 true 65535 79 8388608
+# 키보드(입력 소스 단축키, fn 키, 키 반복)는 macOS 기본값을 쓴다 — 여기서 건드리지 않음.
 
 # ── Spotlight (Raycast가 대체) ──
 try "symbolichotkey 64 (Spotlight ⌘Space) 비활성" \
   set_shortcut 64 false
 try "symbolichotkey 65 (Spotlight ⌘⌥Space) 비활성" \
   set_shortcut 65 false
-
-# ── F1/F2 등을 표준 function 키로 ──
-try "F1/F2 표준 function 키 모드" \
-  defaults write NSGlobalDomain com.apple.keyboard.fnState -bool true
-
-# ── 키 반복 속도 최소 ──
-try "KeyRepeat = 2 (반복 간격 ~30ms)" \
-  defaults write NSGlobalDomain KeyRepeat -int 2
-try "InitialKeyRepeat = 15 (반복 시작 지연 ~225ms)" \
-  defaults write NSGlobalDomain InitialKeyRepeat -int 15
-try "ApplePressAndHoldEnabled = false (악센트 선택 UI 비활성)" \
-  defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
 
 # ── 트랙패드: 탭으로 클릭 ──
 try "AppleMultitouchTrackpad Clicking (내장)" \
