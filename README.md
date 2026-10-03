@@ -37,10 +37,6 @@ $EDITOR ~/.zshrc.d/secrets.zsh
 
 # 회사 머신이면: 회사 GitHub 계정용 SSH 키도 별도 생성/등록
 ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -C "hyounoh@your-company.co.kr"
-
-# Karabiner-Elements — sudo 프롬프트 필요한 cask라 Brewfile에서 제외됨.
-# 대화형 터미널에서 직접 설치 (설치 후 시스템 설정에서 접근성 권한 승인):
-brew install --cask karabiner-elements
 ```
 
 ## 프로파일과 git identity
@@ -65,12 +61,6 @@ brew install --cask karabiner-elements
 
 1. **부트스트랩 1줄** 실행 → profile은 `work` 선택 (HTTPS로 clone, SSH 불필요)
 2. `git user.name` / `git user.email` 프롬프트에 **새 회사 정보** 입력
-3. Karabiner 수동 설치 (Brewfile에 없음, sudo 프롬프트 필요):
-   ```bash
-   brew install --cask karabiner-elements
-   # 시스템 설정 → 개인정보 보호 및 보안 → 접근성 / 입력 모니터링에서
-   # Karabiner-Elements, karabiner_grabber, karabiner_observer 승인
-   ```
 
 ### Phase B — 회사 Git 계정 연결
 
@@ -146,7 +136,7 @@ brew install --cask karabiner-elements
 
 | Phase | 소요 |
 |-------|------|
-| A (chezmoi + Karabiner) | ~15분 |
+| A (chezmoi) | ~15분 |
 | B (회사 Git) | ~10분 |
 | C (AWS/K8s) | ~20분 (팀별 편차 큼) |
 | D (Docker) | ~15분 |
@@ -170,15 +160,10 @@ brew install --cask karabiner-elements
 실패 시 어느 항목이 실패했는지 요약 리포트.
 
 현재 포함된 항목:
-- 키보드 단축키
-  - ⌃Space (이전 입력 소스) 비활성
-  - 다음 입력 소스를 **F18**로 (Karabiner의 Right Command → F18과 연동 → 한/영 전환)
-  - Spotlight ⌘Space / ⌘⌥Space 비활성 (Raycast가 대체)
-  - F1/F2 등을 표준 function 키로
-- 키 반복 속도: `KeyRepeat=2`, `InitialKeyRepeat=15`, `ApplePressAndHoldEnabled=false`
+- Spotlight ⌘Space / ⌘⌥Space 비활성 (Raycast가 대체)
 - 트랙패드 탭 클릭: 내장 + Bluetooth 양쪽
 
-Karabiner 프로파일은 `private_dot_ssh`와 동일한 0600 패턴으로 `dot_config/private_karabiner/`에 관리. 최초 실행 시 macOS 접근성 권한 수동 부여 필요.
+키보드(입력 소스 단축키, fn 키, 키 반복, 보조 키)는 macOS 기본값을 그대로 쓴다. 한/영 전환은 ⌃Space.
 
 ## git 구조적 diff (difftastic)
 

@@ -1305,21 +1305,12 @@ open -na "Google Chrome" --args --incognito "https://..."
 - DevTools: ⌘+Option+I, 콘솔 ⌘+Option+J, 요소 선택 ⌘+Shift+C
 - 프로필 분리로 업무/개인 격리
 
-### Karabiner-Elements
-키보드 리맵. 이 dotfiles의 프로파일:
-- Caps Lock ↔ Left Control 스왑
-- Right Command → F18 (macOS symbolichotkey 61과 연동, 한/영 전환)
-
-설정: `~/.config/karabiner/karabiner.json` (chezmoi 관리).
-**최초 실행 시 macOS 접근성 권한 수동 승인 필요.**
-
 ### macOS 시스템 defaults (이 dotfiles가 자동 적용)
 `run_onchange_05-macos-defaults.sh`로 관리:
-- 입력 소스 단축키 (이전 비활성, 다음 = F18)
 - Spotlight 비활성 (Raycast 대체)
-- F1/F2 표준 function 키
-- 키 반복 속도 최소 (`KeyRepeat=2`, `InitialKeyRepeat=15`, `ApplePressAndHoldEnabled=false`)
 - 트랙패드 탭 클릭
+
+키보드는 macOS 기본값 사용 (한/영 전환 ⌃Space).
 
 ---
 
