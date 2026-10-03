@@ -4,8 +4,20 @@ ZSH_THEME=""  # disabled: using starship
 plugins=(git)
 source "$ZSH/oh-my-zsh.sh"
 
+# ── JDK ───────────────────────────────────────────────────
+export JAVA_HOME=$(/usr/libexec/java_home -v 21 2>/dev/null)
+export PATH="$JAVA_HOME/bin:$PATH"
+
 # ── Cargo ─────────────────────────────────────────────────
 [[ -f "$HOME/.cargo/env" ]] && source "$HOME/.cargo/env"
 
+# ── GitHub MCP (Claude Code) ──────────────────────────────
+# Pull token from gh CLI keyring at shell startup — no hardcoded secret in this file.
+export GITHUB_PERSONAL_ACCESS_TOKEN="$(gh auth token 2>/dev/null)"
+
 # ── Modular configs ──────────────────────────────────────
 for f in ~/.zshrc.d/*.zsh(N); do source "$f"; done
+# SSH 접속 시 tmux 자동 attach (모바일 Terminus 대비)
+if [[ -n "$SSH_CONNECTION" && -z "$TMUX" ]]; then
+  tmux attach -t main 2>/dev/null || tmux new -s main
+fi
